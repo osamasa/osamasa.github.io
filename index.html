@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>フォーム</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"/>
+<link rel="stylesheet" href="custom.css"/>
+<script src="jquery.js"></script>
+<script src="jquery.mobile-1.4.0.min.js"></script>
+<style type="text/css">
+.containing-element .ui-slider-switch { width: 9em }
+.ph-tap{}
+.ph-tapped{ background: #6495ed }
+</style>
+<script type="text/javascript">
+  var game_num=0;
+  var maxloop=5;
+
+  function csv2json(data){
+    var jsonArray = [];
+    var csvArray = data.split('\r\n');
+     
+    for (var i = 0; i < csvArray.length - 1; i++) {
+      var a_line = new Array();
+      // カンマで区切られた各データに分割する
+      var csvArrayD = csvArray[i].split(',');
+      //// 各データをループ処理する
+      jsonArray.push(csvArrayD);
+    }
+    return jsonArray;
+  }
+
+  function onSuccess(data, status){
+    $.mobile.loading("show");
+    kumiawase = csv2json(data);
+    setGameList(kumiawase);
+    setTimeout(function(){
+      $.mobile.loading( "hide" );
+      var tmp = "li.ph-tap[name='lishiai_"+ (game_num-5+1)+"']";
+      $(tmp).css("background", "#6495ed");     
+    }, 700);
+  }
+
+  function onError(data, status){
+      // handle an error
+      alert("err");
+  }   
+    
+  function do_command( ninzu ){
+      $.ajax({
+          type: "POST",
+          url: ninzu + ".csv",
+          cache: false,
+          success: onSuccess,
+          error: onError
+      });
+      return false;
+  }
+
+  function listRefreshFunc() {
+     $('#shiaiokikae:visible').listview('refresh');
+     $("li.ph-tap").bind("tap", function(){
+       var liname="li.ph-tap[name='" + $(this).attr("name") + "']";
+       $("li.ph-tap").css("background", "#ffffff");
+       $(liname).css("background", "#6495ed");
+     });
+  }
+
+      function getKumiawaseFromNum(kumiawase,men,ninzu,doubles,to,limit) {
+        var okuri = (doubles == 1 ? 2 : 1) * men;
+        var kai=0;
+        var ret=new Array(limit);
+
+        // 表示
+        var start_index = to * okuri;
+        if(start_index >= kumiawase.length) {
+	   start_index = start_index % kumiawase.length;
+        }
+
+        for(var i=0;i<limit ;i++) {
+          ret[i] = new Array((doubles==1 ? 4 : 2) * men);
+	  for(var l=0;l<men;l++) {
+            for(var j=0;j<(doubles==1 ? 4 : 2);j++) {
+              if((doubles==1) && (j==2)) {
+                start_index += 1;
+              }
+              if(start_index >= kumiawase.length) {
+                start_index = 0;
+              }
+	      ret[i][(doubles==1 ? 4 : 2)*l+j]=kumiawase[start_index][j % 2];
+            }
+            start_index += 1;
+          }
+        }
+        return ret;
+      }
+
+  function setGameList(kumiawase) {
+
+     var men = $('#select-choice-2').val();
+     var ninzu = $('#select-choice-1').val();
+
+     var doubles = $('#flip-min').val();
+
+     if(men > Math.floor(ninzu / (doubles == 1 ? 4 : 2))) {
+        men = Math.floor(ninzu / (doubles == 1 ? 4 : 2));
+     }
+
+     var ret = getKumiawaseFromNum(kumiawase,men,ninzu,doubles,game_num,maxloop);
+
+     // 表示
+     var text='';
+     for(var i=0;i<maxloop;i++) {
+       text += '<li data-role="list-divider">第' + (game_num+i+1) + '試合</li>';
+       for(var l=0;l<men;l++) {
+         text += '<li class="ph-tap" name="lishiai_' +(game_num+i+1)+'">';
+         if(doubles == 1) { 
+            text += '<div class="ui-grid-d">';
+            text += '<div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*4] + '</button></div></div>';
+            text += '<div class="ui-block-b"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*4+1] + '</button></div></div>';
+            text += '<div class="ui-block-c"><div class="button-wrap"></div></div>';
+            text += '<div class="ui-block-d"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*4+2] + '</button></div></div>';
+            text += '<div class="ui-block-e"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*4+3] + '</button></div></div>';
+         } else {
+            text += '<div class="ui-grid-b">';
+            text += '<div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*2] + '</button></div></div>';
+            text += '<div class="ui-block-b"><div class="button-wrap"></div></div>';
+            text += '<div class="ui-block-c"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">' + ret[i][l*2+1] + '</button></div></div>';
+         }
+          text += '</div>';
+       }
+       text +='</li>';
+//       if(game_num == 0) {
+          $('#shiaiokikae').html(text);
+//       } else {
+//          $('#shiaiokikae').append(text);
+//       }
+     }
+     game_num+=5;
+
+     listRefreshFunc();
+  }
+
+
+   $(document).bind("mobileinit", function(){
+     // 初期値の上書き
+    $.mobile.loader.prototype.options.text = "loading";
+    $.mobile.loader.prototype.options.textVisible = false;
+    $.mobile.loader.prototype.options.theme = "a";
+    $.mobile.loader.prototype.options.html = "";
+   });
+
+   $(document).on('pageshow', "#s1",function() {
+     game_num=0;
+   });
+   $(document).on('pageshow', "#s2",function() {
+     listRefreshFunc();
+   });
+
+   $(document).on('pageinit','#s1',function() {
+     $(".nextgame").click(function(){
+       var ninzu = $('#select-choice-1').val();
+       do_command(ninzu);
+     });
+   });
+
+   $(document).on('pageinit','#s2',function() {
+     $(".prevgame").click(function(){
+      game_num = game_num - (maxloop * 2);
+      if(game_num < 0) {
+         game_num = 0;
+         $.mobile.changePage("#s1");
+         return false;
+       }
+       var ninzu = $('#select-choice-1').val();
+       do_command(ninzu);
+     });
+   });
+
+</script>
+</head>
+<body>
+  <div data-role="page" id="s1">
+    <div data-role="header" data-theme="a" id="header">
+      <h1>テニス乱数表君</h1>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+    </div>
+    <div data-role="content">
+      <form>
+	  <div class="containing-element">
+	    <label for="flip-min">ゲーム形式:</label>
+	    <select name="slider" id="flip-min" data-role="slider">
+	      <option value="1">ダブルス</option>
+	      <option value="0">シングルス</option>
+	    </select>
+	  </div>
+
+	<div data-role="fieldcontain">
+          <label for="select-choice-1">人数</label>
+          <select name="select-choice-1" id="select-choice-1">
+            <option value="4">4人</option>
+            <option value="5">5人</option>
+            <option value="6">6人</option>
+            <option value="7">7人</option>
+            <option value="8">8人</option>
+            <option value="9">9人</option>
+            <option value="10">10人</option>
+            <option value="11">11人</option>
+            <option value="12">12人</option>
+            <option value="13">13人</option>
+            <option value="14">14人</option>
+            <option value="15">15人</option>
+            <option value="16">16人</option>
+            <option value="17">17人</option>
+            <option value="18">18人</option>
+            <option value="19">19人</option>
+            <option value="20">20人</option>
+            <option value="21">21人</option>
+            <option value="22">22人</option>
+            <option value="23">23人</option>
+            <option value="24">24人</option>
+            <option value="25">25人</option>
+            <option value="26">26人</option>
+            <option value="27">27人</option>
+            <option value="28">28人</option>
+            <option value="29">29人</option>
+            <option value="30">30人</option>
+          </select>
+	</div>
+	<div data-role="fieldcontain">
+          <label for="select-choice-2">面数</label>
+          <select name="select-choice-2" id="select-choice-2">
+            <option value="1">1面</option>
+            <option value="2">2面</option>
+            <option value="3">3面</option>
+            <option value="4">4面</option>
+            <option value="5">5面</option>
+            <option value="6">6面</option>
+            <option value="7">7面</option>
+            <option value="8">8面</option>
+            <option value="9">9面</option>
+            <option value="10">10面</option>
+          </select>
+	</div>
+	<a href="#s2" class="nextgame" id="b1" data-role="button" type="button">決定</a>
+      </form>
+    </div>
+    <div data-role="footer">
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+      <h2>Osamasa(C) 2014</h2>
+    </div>
+  </div>
+
+  <div data-role="page" id="s2">
+    <div data-role="header" data-theme="a" id="header">
+      <h1>テニス乱数表君</h1>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+    </div>
+    <div data-role="content">
+      <div class="content-primary main-content">
+
+	<ul data-role="listview" id="buttonlist">
+	  <li>
+	    <div class="ui-grid-a">
+	      <div class="ui-block-a">
+		<input type="button" class="nextgame" id="b2" value="もっと見る">
+	      </div>
+	      <div class="ui-block-b">
+		<input type="button" class="prevgame" id="b3" value="戻る">
+	      </div>
+	  </li>
+	</ul>
+
+	<ul data-role="listview" id="shiaiokikae">
+	  <li data-role="list-divider">第1試合</li> 
+	  <li>
+	    <div class="ui-grid-d">
+	      <div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">1</button></div></div>
+	      <div class="ui-block-b"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">2</button></div></div>
+	      <div class="ui-block-c"></div>
+	      <div class="ui-block-d"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">3</button></div></div>
+	      <div class="ui-block-e"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">4</button></div></div>
+	    </div>
+	  </li> 
+	  <li>
+	    <div class="ui-grid-d">
+	      <div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">1</button></div></div>
+	      <div class="ui-block-b"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">2</button></div></div>
+	      <div class="ui-block-c"></div>
+	      <div class="ui-block-d"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">3</button></div></div>
+	      <div class="ui-block-e"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">4</button></div></div>
+	    </div>
+	  </li> 
+	  <li>
+	    <div class="ui-grid-d">
+	      <div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">1</button></div></div>
+	      <div class="ui-block-b"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">2</button></div></div>
+	      <div class="ui-block-c"></div>
+	      <div class="ui-block-d"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">3</button></div></div>
+	      <div class="ui-block-e"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">4</button></div></div>
+	    </div>
+	  </li> 
+	</ul>
+	<ul data-role="listview" id="buttonlist">
+	  <li>
+	    <div class="ui-grid-a">
+	      <div class="ui-block-a">
+		<input type="button" class="nextgame" id="b2" value="もっと見る">
+	      </div>
+	      <div class="ui-block-b">
+		<input type="button" class="prevgame" id="b3" value="戻る">
+	      </div>
+	  </li>
+	</ul>
+      </div>
+    </div>
+    <div data-role="footer">
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-home">Home</a>
+      <h2>Osamasa(C) 2014</h2>
+    </div>
+  </div>
+</body>
+</html>
