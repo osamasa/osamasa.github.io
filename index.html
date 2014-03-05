@@ -49,7 +49,7 @@
     
   function do_command( ninzu ){
       $.ajax({
-          type: "POST",
+          type: "GET",
           url: ninzu + ".csv",
           cache: false,
           success: onSuccess,
