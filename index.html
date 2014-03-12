@@ -19,6 +19,7 @@
   var g_strLeft=''
   var g_strRight='';
   var g_nowGameNum=0;
+  var games = new Array(256);
 
   function csv2json(data){
     var jsonArray = [];
@@ -128,6 +129,40 @@
      });
   }
 
+  function setGameKekka(from,to) {
+    for(var i = from-1;i<(to-1);i++) {
+       if((games[i] != undefined) || (games[i] != null)) {
+          var r1 = games[i]['hantei'];
+          var jibun = '#' + (i+1) + '_' + games[i]['team1'];
+          var aite = '#' + (i+1) + '_' + games[i]['team2'];
+          var jibun_tensu = games[i]['tokuten_l'];
+          var aite_tensu = games[i]['tokuten_r'];
+
+          if(r1 != 0) {
+            if(r1 == 1) {
+              $(jibun).text('○');
+              $(aite).text('×');
+            } else if(r1 == 2){
+              $(jibun).text('×');
+              $(aite).text('○');
+            } else if(r1 == 3) {
+              $(jibun).text('△');
+              $(aite).text('△');
+            }
+          } else {
+            $(jibun).text('');
+            $(aite).text('');　　　　　　　　　
+          }
+          if(jibun_tensu > -1) {
+             $(jibun).append(jibun_tensu);
+          }
+          if(aite_tensu > -1) {
+            $(aite).append(aite_tensu);
+          }
+       }
+    }
+  }
+
   function setGameList(kumiawase) {
 
      var men = $('#select-choice-2').val();
@@ -219,6 +254,14 @@
           var r1 = $('[name=r1]:checked').val();
           var jibun = '#' + g_nowGameNum + '_' + g_strLeft;
           var aite = '#' + g_nowGameNum + '_' + g_strRight;
+
+          games[g_nowGameNum-1] = new Array();
+          games[g_nowGameNum-1]['hantei'] = r1;
+          games[g_nowGameNum-1]['team1'] = g_strLeft;
+          games[g_nowGameNum-1]['team2'] = g_strRight;
+          games[g_nowGameNum-1]['tokuten_l'] = $("#select-choice-10").children(':selected').val();
+          games[g_nowGameNum-1]['tokuten_r'] = $("#select-choice-11").children(':selected').val();
+
           if(r1 != 0) {
             if(r1 == 1) {
               $(jibun).text('○');
