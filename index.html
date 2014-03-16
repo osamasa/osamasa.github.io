@@ -23,6 +23,7 @@
   var g_gameindex = 0;
   var g_lastGameindex = 0;
   var g_men =0;
+  var g_dobules=false;
 
   function csv2json(data){
     var jsonArray = [];
@@ -120,14 +121,20 @@
        g_strRight = $(this).jqmData('aiteteam');
        g_nowGameNum= $(this).jqmData('shiai');
        var strTaisen = g_strLeft + ' VS ' + g_strRight;
-       var strLeft = g_strLeft.replace('_',' ');
-       var strRight = g_strRight.replace('_',' ');
+       var strLeft = g_strLeft;
+       if(g_dobules==true) {
+         strLeft = g_strLeft.replace('_',' ');
+       }
+       var strRight = g_strRight;
+       if(g_dobules==true) {  
+          g_strRight.replace('_',' ');
+       }
 
-        $(".taisen").text(strTaisen+'の勝敗設定');
-        $(".left_t_win").text(strLeft + 'の勝ち');
-        $(".right_t_win").text(strRight + 'の勝ち');
-        $(".left_t_tensu").text(strLeft + 'の点数');
-        $(".right_t_tensu").text(strRight + 'の点数');
+       $(".taisen").text(strTaisen+'の勝敗設定');
+       $(".left_t_win").text(strLeft + 'の勝ち');
+       $(".right_t_win").text(strRight + 'の勝ち');
+       $(".left_t_tensu").text(strLeft + 'の点数');
+       $(".right_t_tensu").text(strRight + 'の点数');
 
 
        if((games[g_gameindex] != undefined) || (games[g_gameindex] != null)) {
@@ -193,6 +200,7 @@
      var ninzu = $('#select-choice-1').val();
 
      var doubles = $('#flip-min').val();
+     g_dobules = (doubles == 1 ? true : false);
 
      if(men > Math.floor(ninzu / (doubles == 1 ? 4 : 2))) {
         men = Math.floor(ninzu / (doubles == 1 ? 4 : 2));
@@ -218,9 +226,9 @@
             text += '<div class="ui-block-e"><div class="button-wrap"><a id="a'+((i*men)+l)+'_4'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+3] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'"></div></div>';
          } else {
             text += '<div class="ui-grid-b">';
-            text += '<div class="ui-block-a"><div class="button-wrap"><a id="a'+((i*men)+l)+'_1'+'" href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2]+'"></div></div>';
+            text += '<div class="ui-block-a"><div class="button-wrap"><a id="a'+((i*men)+l)+'_1'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*2]+'" data-aiteteam="'+ret[i][l*2+1]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2]+'"></div></div>';
             text += '<div class="ui-block-b"><div class="button-wrap"></div></div>';
-            text += '<div class="ui-block-c"><div class="button-wrap"><a id="a'+((i*men)+l)+'_2'+'" href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2+1]+'"></div></div>';
+            text += '<div class="ui-block-c"><div class="button-wrap"><a id="a'+((i*men)+l)+'_2'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*2+1]+'" data-aiteteam="'+ret[i][l*2]+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2+1]+'"></div></div>';
          }
           text += '</div>';
        }
@@ -343,7 +351,14 @@
              r1 = "△";
              r2 = "△";
            }
-           text += games[i]['team1'].replace('_',' ') + "(" +  r1 + ") VS " + games[i]['team2'].replace('_',' ') + "(" + r2 +")";
+           var team1 = games[i]['team1'];
+           var team2 = games[i]['team2'];
+           if(g_dobules == true) {
+              team1 = games[i]['team1'].replace('_',' ');
+              team2 = games[i]['team2'].replace('_',' ');
+           }
+
+           text += team1 + "(" +  r1 + ") VS " + team2 + "(" + r2 +")";
            if((games[i]['tokuten_l'] > -1) && (games[i]['tokuten_r'] > -1)) {
              text += " " + games[i]['tokuten_l'] + "-" + games[i]['tokuten_r'];
            }
