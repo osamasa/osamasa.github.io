@@ -19,8 +19,10 @@
   var g_strLeft=''
   var g_strRight='';
   var g_nowGameNum=0;
-  var g_lastGameNum=0;
   var games = new Array(256);
+  var g_gameindex = 0;
+  var g_lastGameindex = 0;
+  var g_men =0;
 
   function csv2json(data){
     var jsonArray = [];
@@ -41,7 +43,7 @@
     kumiawase = csv2json(data);
     setGameList(kumiawase);
     if(game_num>0)
-      setGameKekka(game_num-maxloop, game_num);
+      setGameKekka((game_num-maxloop)*g_men, (game_num)*g_men);
     setTimeout(function(){
       $.mobile.loading( "hide" );
       var tmp = "li.ph-tap[name='lishiai_"+ (game_num-5+1)+"']";
@@ -107,12 +109,16 @@
 
      $(".dialogopenbtn").click(function(){
 
+       var aid=$(this).attr("id");
+//       var tmp="a#"+aid;
+//       g_gameindex = $(tmp).parent("li.ph-tap").jqmData("gid");
+       g_gameindex = $(this).parent().parent().parent().parent().jqmData("gid");
+       if(g_lastGameindex < g_gameindex) {
+          g_lastGameindex = g_gameindex;
+       }
        g_strLeft = $(this).jqmData('jibunteam');
        g_strRight = $(this).jqmData('aiteteam');
        g_nowGameNum= $(this).jqmData('shiai');
-       if(g_lastGameNum < g_nowGameNum) {
-          g_lastGameNum = g_nowGameNum;
-       }
        var strTaisen = g_strLeft + ' VS ' + g_strRight;
        var strLeft = g_strLeft.replace('_',' ');
        var strRight = g_strRight.replace('_',' ');
@@ -124,13 +130,13 @@
         $(".right_t_tensu").text(strRight + 'の点数');
 
 
-       if((games[g_nowGameNum-1] != undefined) || (games[g_nowGameNum-1] != null)) {
-        $('input[name=r1]').val([games[g_nowGameNum-1]['hantei']]).checkboxradio('refresh');
+       if((games[g_gameindex] != undefined) || (games[g_gameindex] != null)) {
+        $('input[name=r1]').val([games[g_gameindex]['hantei']]).checkboxradio('refresh');
         var myselect = $("select#select-choice-10");
-        myselect[0].selectedIndex = parseInt(games[g_nowGameNum-1]['tokuten_l'])+1;
+        myselect[0].selectedIndex = parseInt(games[g_gameindex]['tokuten_l'])+1;
         myselect.selectmenu("refresh");
         myselect = $("select#select-choice-11");
-        myselect[0].selectedIndex = parseInt(games[g_nowGameNum-1]['tokuten_r'])+1;
+        myselect[0].selectedIndex = parseInt(games[g_gameindex]['tokuten_r'])+1;
         myselect.selectmenu("refresh");
 
  } else {
@@ -149,10 +155,10 @@
 
   function setGameKekka(from,to) {
     for(var i = from;i<to;i++) {
-       if((games[i] != undefined) || (games[i] != null)) {
+       if((games[i] != undefined) && (games[i] != null)) {
           var r1 = games[i]['hantei'];
-          var jibun = '#' + (i+1) + '_' + games[i]['team1'];
-          var aite = '#' + (i+1) + '_' + games[i]['team2'];
+          var jibun = '#' + (games[i]['shiai']) + '_' + games[i]['team1'];
+          var aite = '#' + (games[i]['shiai']) + '_' + games[i]['team2'];
           var jibun_tensu = games[i]['tokuten_l'];
           var aite_tensu = games[i]['tokuten_r'];
 
@@ -192,26 +198,29 @@
         men = Math.floor(ninzu / (doubles == 1 ? 4 : 2));
      }
 
+     g_men = men;
+
      var ret = getKumiawaseFromNum(kumiawase,men,ninzu,doubles,game_num,maxloop);
 
      // 表示
      var text='';
+
      for(var i=0;i<maxloop;i++) {
        text += '<li data-role="list-divider">第' + (game_num+i+1) + '試合</li>';
        for(var l=0;l<men;l++) {
-         text += '<li class="ph-tap" name="lishiai_' +(game_num+i+1)+'">';
+         text += '<li class="ph-tap" data-gid="'+ ((i*men)+l) +'" name="lishiai_' +(game_num+i+1)+'">';
          if(doubles == 1) { 
             text += '<div class="ui-grid-d">';
-            text += '<div class="ui-block-a"><div class="button-wrap"><a href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+l+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4] + '</a></div></div>';
-            text += '<div class="ui-block-b"><div class="button-wrap"><a href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+l+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4]+'_'+ret[i][l*4+1]+'"></div></div>';
+            text += '<div class="ui-block-a"><div class="button-wrap"><a id="a'+((i*men)+l)+'_1'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4] + '</a></div></div>';
+            text += '<div class="ui-block-b"><div class="button-wrap"><a id="a'+((i*men)+l)+'_2'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4]+'_'+ret[i][l*4+1]+'"></div></div>';
             text += '<div class="ui-block-c"><div class="button-wrap"></div></div>';
-            text += '<div class="ui-block-d"><div class="button-wrap"><a href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-aiteteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-shiai="'+(game_num+i+l+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+2] + '</a></div></div>';
-            text += '<div class="ui-block-e"><div class="button-wrap"><a href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+3] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'"></div></div>';
+            text += '<div class="ui-block-d"><div class="button-wrap"><a id="a'+((i*men)+l)+'_3'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-aiteteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+2] + '</a></div></div>';
+            text += '<div class="ui-block-e"><div class="button-wrap"><a id="a'+((i*men)+l)+'_4'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+3] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'"></div></div>';
          } else {
             text += '<div class="ui-grid-b">';
-            text += '<div class="ui-block-a"><div class="button-wrap"><a href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2]+'"></div></div>';
+            text += '<div class="ui-block-a"><div class="button-wrap"><a id="a'+((i*men)+l)+'_1'+'" href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2]+'"></div></div>';
             text += '<div class="ui-block-b"><div class="button-wrap"></div></div>';
-            text += '<div class="ui-block-c"><div class="button-wrap"><a href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2+1]+'"></div></div>';
+            text += '<div class="ui-block-c"><div class="button-wrap"><a id="a'+((i*men)+l)+'_2'+'" href="#dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*2+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*2+1]+'"></div></div>';
          }
           text += '</div>';
        }
@@ -269,16 +278,19 @@
 
    $(document).on('pageshow','#dialog', function() {
        $('#dialogsettei').click(function() {
+
+
           var r1 = $('[name=r1]:checked').val();
           var jibun = '#' + g_nowGameNum + '_' + g_strLeft;
           var aite = '#' + g_nowGameNum + '_' + g_strRight;
 
-          games[g_nowGameNum-1] = new Array();
-          games[g_nowGameNum-1]['hantei'] = r1;
-          games[g_nowGameNum-1]['team1'] = g_strLeft;
-          games[g_nowGameNum-1]['team2'] = g_strRight;
-          games[g_nowGameNum-1]['tokuten_l'] = $("#select-choice-10").children(':selected').val();
-          games[g_nowGameNum-1]['tokuten_r'] = $("#select-choice-11").children(':selected').val();
+          games[g_gameindex] = new Array();
+          games[g_gameindex]['shiai'] = g_nowGameNum;
+          games[g_gameindex]['hantei'] = r1;
+          games[g_gameindex]['team1'] = g_strLeft;
+          games[g_gameindex]['team2'] = g_strRight;
+          games[g_gameindex]['tokuten_l'] = $("#select-choice-10").children(':selected').val();
+          games[g_gameindex]['tokuten_r'] = $("#select-choice-11").children(':selected').val();
 
           if(r1 != 0) {
             if(r1 == 1) {
@@ -312,25 +324,31 @@
       var shohai = new Array($('#select-choice-1').val());
       var text = "本日はお疲れ様でした\n\n";
       text += "本日("+y+"年"+m+"月"+d+"日"+")の試合結果をお送りします\n\n";
-      for(var i=0;i<g_lastGameNum;i++) {
-         text += "第"+(i+1) + "試合\n";
-         var r1 = "";
-         var r2 = "";
-         if(games[i]['hantei'] == 1) {
-           r1 = "○";
-           r2 = "×";
-         } else if(games[i]['hantei'] == 2) {
-           r1 = "×";
-           r2 = "○";
-         } else if(games[i]['hantei'] == 3) {
-           r1 = "△";
-           r2 = "△";
+      var lastshiai = 0;
+      for(var i=0;i<=g_lastGameindex;i++) {
+         if((games[i] != undefined) && (games[i] != null)) {
+           if(lastshiai != games[i]['shiai']) {
+             text += "第"+games[i]['shiai'] + "試合\n";
+             lastshiai = games[i]['shiai'];
+           }
+           var r1 = "";
+           var r2 = "";
+           if(games[i]['hantei'] == 1) {
+             r1 = "○";
+             r2 = "×";
+           } else if(games[i]['hantei'] == 2) {
+             r1 = "×";
+             r2 = "○";
+           } else if(games[i]['hantei'] == 3) {
+             r1 = "△";
+             r2 = "△";
+           }
+           text += games[i]['team1'].replace('_',' ') + "(" +  r1 + ") VS " + games[i]['team2'].replace('_',' ') + "(" + r2 +")";
+           if((games[i]['tokuten_l'] > -1) && (games[i]['tokuten_r'] > -1)) {
+             text += " " + games[i]['tokuten_l'] + "-" + games[i]['tokuten_r'];
+           }
+           text += "\n\n";
          }
-         text += games[i]['team1'].replace('_',' ') + "(" +  r1 + ") VS " + games[i]['team2'].replace('_',' ') + "(" + r2 +")";
-         if((games[i]['tokuten_l'] > -1) && (games[i]['tokuten_r'] > -1)) {
-           text += " " + games[i]['tokuten_l'] + "-" + games[i]['tokuten_r'];
-         }
-         text += "\n\n";
       }
       $("#textarea1").text(text);
    });
