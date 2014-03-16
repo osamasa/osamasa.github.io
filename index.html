@@ -478,8 +478,8 @@
 	  <li data-role="list-divider">第1試合</li> 
 	  <li>
 	    <div class="ui-grid-d">
-	      <div class="ui-block-a"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all dialogopenbtn">1</button></div></div>
-	      <div class="ui-block-b"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">2</button></div></div>
+	      <div class="ui-block-a" ><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all dialogopenbtn">1</button></div></div>
+	      <div class="ui-block-b" ><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">2</button></div></div>
 	      <div class="ui-block-c"></div>
 	      <div class="ui-block-d"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">3</button></div></div>
 	      <div class="ui-block-e"><div class="button-wrap"><button class="ui-shadow ui-btn ui-corner-all">4</button></div></div>
@@ -590,6 +590,7 @@
     <div data-role="content">
       <h2>メール文</h2>
       <div data-role="fieldcontain">
+	<a href="#s4" data-role="button" class="ui-shadow ui-btn ui-corner-all">番号割付</a>
 	<textarea name="textarea1" id="textarea1"></textarea>
       </div>
     </div>
@@ -597,6 +598,63 @@
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
       <a href="#s2" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
       <h2>Osamasa(C) 2014</h2>
+    </div>
+  </div>
+
+  <div data-role="page" id="s4">
+    <div data-role="header" data-theme="a" id="header">
+      <h1>テニス乱数表君</h1>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#s3" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+    </div>
+    <div data-role="content">
+      <h2>メンバー割付</h2>
+      <div data-role="fieldcontain">
+	<ul data-role="listview" id="memberlist">
+	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>1</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
+	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>2</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
+	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>3</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
+	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>4</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
+	  <li>
+	    <div class="ui-grid-a">
+	      <div class="ui-block-a">
+		<p><a href="#s3" data-role="button" >決定</a></p>
+	      </div>
+	      <div class="ui-block-b">
+		<p><a data-role="button" data-rel="back">戻る</a></p>
+	      </div>
+	    </div>
+	  </li>
+	</ul>
+      </div>
+    </div>
+  </div>
+  <div data-role="page" id="s5">
+    <div data-role="header" data-theme="a" id="header">
+      <h1>テニス乱数表君</h1>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#s4" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+    </div>
+    <div data-role="content">
+      <h2>メンバー参照</h2>
+      <div data-role="fieldcontain">
+	<ul data-role="listview" id="sansyoulist">
+	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
+	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
+	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
+	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
+	  <li>
+	    <div class="ui-grid-a">
+	      <div class="ui-block-a">
+		<p><a href="#s4" data-role="button" >選択</a></p>
+	      </div>
+	      <div class="ui-block-b">
+		<p><a data-role="button" data-rel="back">戻る</a></p>
+	      </div>
+	    </div>
+	  </li>
+	</ul>
+      </div>
     </div>
   </div>
 </body>
