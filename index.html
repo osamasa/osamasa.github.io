@@ -122,12 +122,10 @@
        g_nowGameNum= $(this).jqmData('shiai');
        var strTaisen = g_strLeft + ' VS ' + g_strRight;
        var strLeft = g_strLeft;
+       var strRight = g_strRight;
        if(g_dobules==true) {
          strLeft = g_strLeft.replace('_',' ');
-       }
-       var strRight = g_strRight;
-       if(g_dobules==true) {  
-          g_strRight.replace('_',' ');
+         strRight = g_strRight.replace('_',' ');
        }
 
        $(".taisen").text(strTaisen+'の勝敗設定');
