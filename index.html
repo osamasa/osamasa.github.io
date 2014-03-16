@@ -19,7 +19,7 @@
   var g_strLeft=''
   var g_strRight='';
   var g_nowGameNum=0;
-  var games = new Array(256);
+  var games = null;
   var g_gameindex = 0;
   var g_lastGameindex = 0;
   var g_men =0;
@@ -233,11 +233,7 @@
           text += '</div>';
        }
        text +='</li>';
-//       if(game_num == 0) {
-          $('#shiaiokikae').html(text);
-//       } else {
-//          $('#shiaiokikae').append(text);
-//       }
+       $('#shiaiokikae').html(text);
      }
      game_num+=5;
 
@@ -256,7 +252,12 @@
 
    $(document).on('pageshow', "#s1",function() {
      game_num=0;
+     if(games != null) {
+         games = null;
+     }
+     games = new Array(256);
    });
+
    $(document).on('pageshow', "#s2",function() {
      listRefreshFunc();
      setDialogOpen();
