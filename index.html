@@ -264,6 +264,7 @@
    });
 
    $(document).on('pageinit','#s1',function() {
+     $.mobile.changePage("#oshirase");
      $(".nextgame").click(function(){
        var ninzu = $('#select-choice-1').val();
        do_command(ninzu);
@@ -587,6 +588,19 @@
       <a href="#s2" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
+  </div>
+  <div data-role="dialog" id="oshirase">
+    <div data-role="header">
+      <h2><div class="taisen">更新のお知らせ</div></h2>
+      <div data-role="content">
+	<ul>
+	  <li>2014/03/10 Ver 1.0.0 作成公開開始</li>
+	  <li>2014/03/16 Ver 1.1.0 プレイヤーボタンを押すと勝敗および得点を記録出来ます。</li>
+	  <li>2014/03/16 Ver 1.1.1 右上のグリッドボタンを押すと勝敗結果のメール文が作成されます。</li>
+	</ul>
+	<p><a data-role="button" data-rel="back">戻る</a></p>
+      </div>
+    </div> 
   </div>
 </body>
 </html>
