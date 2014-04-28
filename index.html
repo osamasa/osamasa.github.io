@@ -25,6 +25,154 @@
   var g_men =0;
   var g_dobules=false;
 
+var MemberCls = function(id,name) {
+    this.id = id;
+    this.name = name;
+    this.winnum = 0;
+    this.losenum = 0;
+}
+
+MemberCls.prototype.resetScore = function() {
+   this.winnum = 0;
+   this.losenum = 0;
+}
+
+MemberCls.prototype.isId = function(id) {
+   return (this.id == id);
+}
+
+
+MemberCls.prototype.addWinNum = function(winteam) {
+   var i = winteam.length;
+   var ret = false;
+   do {
+     if(winteam[(winteam.length - i)] == this.id) {
+       this.winnum++;
+       ret = true;
+       break;
+     }
+   } while(--i);
+   return ret;
+}
+
+MemberCls.prototype.addLoseNum = function(loseteam) {
+   var i = loseteam.length;
+   var ret = false;
+   do {
+     if(loseteam[(loseteam.length - i)] == this.id) {
+       this.losenum++;
+       ret = true;
+       break;
+     }
+   } while(--i);
+   return ret;
+}
+
+MemberCls.prototype.getTextHead = function() {
+  return this.id + ' : '  + this.name;
+}
+
+MemberCls.prototype.getTextEnd = function() {
+  return this.name + ' さん ' + this.winnum + '勝';
+}
+
+var MemberCtrl = function() {
+    this.members = null;
+    this.dobules = false;
+}
+
+MemberCtrl.prototype.resetGames = function() {
+  var i = this.members.length;
+  do {
+    this.members[(this.members.length - i)].resetScore();
+  } while (--i);
+}
+
+
+MemberCtrl.prototype.getMembersNum = function() {
+    if(this.members != null) {
+      return this.members.length;
+    } else {
+      return 0;
+    }
+}
+
+MemberCtrl.prototype.init = function(doubles_flg) {
+    this.members = null;
+    this.doubles = doubles_flg;
+}
+
+MemberCtrl.prototype.addMember = function(id,name) {
+    if(this.members) {
+      this.members.push(new MemberCls(id,name));
+    } else {
+      this.members = new Array();
+      this.members[0] = new MemberCls(id,name);
+    }
+}
+
+MemberCtrl.prototype.setResult = function(games)  {
+   var i = games.length;
+   var winteam='';
+   var loseteam='';
+   this.resetGames();
+   do {
+      var h = games.length - i;
+
+      if(typeof games[h] == 'undefined')
+         continue;
+      
+      if(games[h]['hantei']  == 1) {
+         winteam = games[(games.length - i)]['team1'];
+         loseteam = games[(games.length - i)]['team2'];
+      } else if(games[(games.length - i)]['hantei']  == 2) {
+         winteam = games[(games.length - i)]['team2'];
+         loseteam = games[(games.length - i)]['team1'];
+      } else {
+         continue;
+      }
+      var winteams = this.splitTeams(winteam);
+      var loseteams = this.splitTeams(loseteam);
+
+      var l = this.members.length;
+      do {
+        this.members[(this.members.length - l)].addWinNum(winteams);
+        this.members[(this.members.length - l)].addLoseNum(loseteams);
+     } while(--l);
+   } while(--i);
+}
+
+MemberCtrl.prototype.splitTeams = function(strTeam) {
+  var tmp = undefined;
+  if(this.doubles == true) {
+    tmp = strTeam.split('_');
+  } else {
+    tmp = new Array();
+    tmp[0] = strTeam;
+  }
+  return tmp;
+}
+
+MemberCtrl.prototype.getTextHead = function() {
+  var i = this.members.length;
+  var ret = '';
+  do {
+    ret += this.members[(this.members.length - i)].getTextHead() + '\n';
+  } while (--i);
+  return ret;
+}
+
+MemberCtrl.prototype.getTextEnd = function() {
+  var i = this.members.length;
+  var ret = '';
+  do {
+    ret += this.members[(this.members.length - i)].getTextEnd() + '\n';
+  } while (--i);
+  return ret;
+}
+
+var memberctrl = new MemberCtrl();
+
   function csv2json(data){
     var jsonArray = [];
     var csvArray = data.split('\r\n');
@@ -135,7 +283,7 @@
        $(".right_t_tensu").text(strRight + 'の点数');
 
 
-       if((games[g_gameindex] != undefined) || (games[g_gameindex] != null)) {
+       if((typeof games[g_gameindex] != 'undefined') || (games[g_gameindex] != null)) {
         $('input[name=r1]').val([games[g_gameindex]['hantei']]).checkboxradio('refresh');
         var myselect = $("select#select-choice-10");
         myselect[0].selectedIndex = parseInt(games[g_gameindex]['tokuten_l'])+1;
@@ -160,7 +308,7 @@
 
   function setGameKekka(from,to) {
     for(var i = from;i<to;i++) {
-       if((games[i] != undefined) && (games[i] != null)) {
+       if((typeof games[i] != 'undefined') && (games[i] != null)) {
           var r1 = games[i]['hantei'];
           var jibun = '#' + (games[i]['shiai']) + '_' + games[i]['team1'];
           var aite = '#' + (games[i]['shiai']) + '_' + games[i]['team2'];
@@ -239,6 +387,60 @@
      setDialogOpen();
   }
 
+  function setMailBun() {
+      var now = new Date();
+      var y   = now.getFullYear();
+      var m   = now.getMonth()+1;
+      var d   = now.getDate();
+      var shohai = new Array($('#select-choice-1').val());
+      var text = "本日はお疲れ様でした\n\n";
+      text += "本日("+y+"年"+m+"月"+d+"日"+")の試合結果をお送りします\n\n";
+      if(memberctrl.getMembersNum() > 0) {
+         memberctrl.setResult(games);
+         text += memberctrl.getTextHead() + "\n";
+      }
+
+      var lastshiai = 0;
+      for(var i=0;i<=g_lastGameindex;i++) {
+         if((typeof games[i] != 'undefined') && (games[i] != null)) {
+           if(lastshiai != games[i]['shiai']) {
+             text += "第"+games[i]['shiai'] + "試合\n";
+             lastshiai = games[i]['shiai'];
+           }
+           var r1 = "";
+           var r2 = "";
+           if(games[i]['hantei'] == 1) {
+             r1 = "○";
+             r2 = "×";
+           } else if(games[i]['hantei'] == 2) {
+             r1 = "×";
+             r2 = "○";
+           } else if(games[i]['hantei'] == 3) {
+             r1 = "△";
+             r2 = "△";
+           }
+           var team1 = games[i]['team1'];
+           var team2 = games[i]['team2'];
+           if(g_dobules == true) {
+              team1 = games[i]['team1'].replace('_',' ');
+              team2 = games[i]['team2'].replace('_',' ');
+           }
+
+           text += team1 + "(" +  r1 + ") VS " + team2 + "(" + r2 +")";
+           if((games[i]['tokuten_l'] > -1) && (games[i]['tokuten_r'] > -1)) {
+             text += " " + games[i]['tokuten_l'] + "-" + games[i]['tokuten_r'];
+           }
+           text += "\n\n";
+         }
+      }
+      if(memberctrl.getMembersNum() > 0) {
+         text += memberctrl.getTextEnd() + "\n";
+      }
+      text += "--\nテニス乱数表君 http://osamasa.github.io/\n";
+      $("#textarea1").text(text);
+      $.mobile.changePage("#s3");
+  }
+
 
    $(document).bind("mobileinit", function(){
      // 初期値の上書き
@@ -251,7 +453,7 @@
    $(document).on('pageshow', "#s1",function() {
      game_num=0;
      if(games != null) {
-         games = null;
+        games = null;
      }
      games = new Array(256);
    });
@@ -281,6 +483,32 @@
        do_command(ninzu);
      });
 
+     $(".setmailbun").click(function() {
+       memberctrl.init(g_dobules);
+
+       $('li.clmem').each(function(){
+          var txtid = '#' + $(this).attr('id') + ' input';
+          var inpval = $(txtid).val();
+          if((typeof inpval != 'undefined') && (inpval != null) && (inpval.length > 0)) {
+            var hthreetxt = '#' + $(this).attr('id') + ' h3';
+            var hnum = parseInt($(hthreetxt).text());
+            memberctrl.addMember(hnum, inpval);
+          }
+       });
+       $.mobile.changePage('#s3');
+     });
+   });
+
+   $(document).on('pageshow','#s4', function() {
+      var ninzu = $('#select-choice-1').val();
+      ninzu++;
+      var maxnum = 30;
+      do {
+        var $tmp = "li#li" + maxnum;
+        $($tmp).css("display", "none");
+      } while(ninzu < maxnum--);
+      $("#s4").page();
+      $("#memberlist").listview('refresh');
    });
 
    $(document).on('pageshow','#dialog', function() {
@@ -324,48 +552,9 @@
    });
 
    $(document).on('pageshow','#s3', function() {
-      var now = new Date();
-      var y   = now.getFullYear();
-      var m   = now.getMonth()+1;
-      var d   = now.getDate();
-      var shohai = new Array($('#select-choice-1').val());
-      var text = "本日はお疲れ様でした\n\n";
-      text += "本日("+y+"年"+m+"月"+d+"日"+")の試合結果をお送りします\n\n";
-      var lastshiai = 0;
-      for(var i=0;i<=g_lastGameindex;i++) {
-         if((games[i] != undefined) && (games[i] != null)) {
-           if(lastshiai != games[i]['shiai']) {
-             text += "第"+games[i]['shiai'] + "試合\n";
-             lastshiai = games[i]['shiai'];
-           }
-           var r1 = "";
-           var r2 = "";
-           if(games[i]['hantei'] == 1) {
-             r1 = "○";
-             r2 = "×";
-           } else if(games[i]['hantei'] == 2) {
-             r1 = "×";
-             r2 = "○";
-           } else if(games[i]['hantei'] == 3) {
-             r1 = "△";
-             r2 = "△";
-           }
-           var team1 = games[i]['team1'];
-           var team2 = games[i]['team2'];
-           if(g_dobules == true) {
-              team1 = games[i]['team1'].replace('_',' ');
-              team2 = games[i]['team2'].replace('_',' ');
-           }
-
-           text += team1 + "(" +  r1 + ") VS " + team2 + "(" + r2 +")";
-           if((games[i]['tokuten_l'] > -1) && (games[i]['tokuten_r'] > -1)) {
-             text += " " + games[i]['tokuten_l'] + "-" + games[i]['tokuten_r'];
-           }
-           text += "\n\n";
-         }
-      }
-      $("#textarea1").text(text);
+     setMailBun();
    });
+
 </script>
 </head>
 <body>
@@ -374,11 +563,12 @@
       <h2><div class="taisen">更新のお知らせ</div></h2>
       <div data-role="content">
 	<ul>
-	  <li>2014/03/10 Ver 1.0.0 作成公開開始</li>
-	  <li>2014/03/16 Ver 1.1.0 プレイヤーボタンを押すと勝敗および得点を記録出来ます。</li>
+	  <li>2014/04/28 Ver 1.2.0 各番号に名前を割り当てられるようにしました。
 	  <li>2014/03/16 Ver 1.1.1 右上のグリッドボタンを押すと勝敗結果のメール文が作成されます。</li>
+	  <li>2014/03/16 Ver 1.1.0 プレイヤーボタンを押すと勝敗および得点を記録出来ます。</li>
+	  <li>2014/03/10 Ver 1.0.0 作成公開開始</li>
 	</ul>
-	<p><a href="#s1" data-role="button" >戻る</a></p>
+	<p><a href="#s1" data-role="button" >閉じる</a></p>
       </div>
     </div> 
   </div>
@@ -457,7 +647,7 @@
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-grid">Mail</a>
+      <a href="#s3" data-role="button" class="ui-btn-right">メール</a>
     </div>
     <div data-role="content">
       <div class="content-primary main-content">
@@ -519,7 +709,7 @@
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-grid">Mail</a>
+      <a href="#s3" data-role="button" class="ui-btn-right">メール</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
@@ -610,23 +800,54 @@
     <div data-role="content">
       <h2>メンバー割付</h2>
       <div data-role="fieldcontain">
-	<ul data-role="listview" id="memberlist">
-	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>1</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
-	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>2</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
-	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>3</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
-	  <li><div class="ui-grid-b"><div class="ui-block-a" style="width:10%;"><h3>4</h3></div><div class="ui-block-b" style="width:60%;"><input type="text" /></div><div class="ui-block-c" style="width:30%;"><a class="ui-btn ui-btn-up-c ui-btn-inline ui-shadow ui-btn-corner-all ui-mini ui-btn-icon-notext" title="Delete" data-wrapperels="span" data-iconshadow="true" data-shadow="true" data-corners="true" href="#s5" data-role="button" data-icon="gear" data-iconpos="notext" data-mini="true" data-inline="true"><span class="ui-btn-inner ui-btn-corner-all"><span class="ui-btn-text">参照</span></a></div></div></li>
+	<ul data-role="listview" id="memberlist" data-inset="true">
+	  <li id="li1" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>1</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" id=""/></div></div></li>
+	  <li id="li2" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>2</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li3" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>3</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li4" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>4</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li5" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>5</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li6" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>6</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li7" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>7</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li8" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>8</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li9" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>9</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li10" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>10</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li11" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>11</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li12" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>12</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li13" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>13</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li14" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>14</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li15" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>15</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li16" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>16</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li17" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>17</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li18" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>18</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li19" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>19</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li20" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>20</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li21" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>21</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li22" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>22</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li23" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>23</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li24" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>24</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li25" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>25</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li26" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>26</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li27" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>27</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li28" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>28</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li29" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>29</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
+	  <li id="li30" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>30</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
 	  <li>
 	    <div class="ui-grid-a">
 	      <div class="ui-block-a">
-		<p><a href="#s3" data-role="button" >決定</a></p>
+		<input type="button" class="setmailbun" id="mb1" value="決定" />
 	      </div>
 	      <div class="ui-block-b">
-		<p><a data-role="button" data-rel="back">戻る</a></p>
+		<input type="button" class="resetmailbun" id="mb2" value="戻る" />
 	      </div>
 	    </div>
 	  </li>
 	</ul>
       </div>
+    </div>
+    <div data-role="footer">
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#s3" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+      <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
   <div data-role="page" id="s5">
