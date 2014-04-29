@@ -858,12 +858,22 @@ var memberctrl = new MemberCtrl();
     </div>
     <div data-role="content">
       <h2>メンバー参照</h2>
+      <fieldset data-role="controlgroup" id="memberfield" >
+	<legend>メンバー選択:</legend>
+     	<input type="radio" name="radio-choice-1" id="radio-choice-1" value="1" checked="checked" />
+     	<label for="radio-choice-1">長田</label>
+
+     	<input type="radio" name="radio-choice-1" id="radio-choice-2" value="2"  />
+     	<label for="radio-choice-2">太郎</label>
+
+     	<input type="radio" name="radio-choice-1" id="radio-choice-3" value="3"  />
+     	<label for="radio-choice-3">花子</label>
+
+     	<input type="radio" name="radio-choice-1" id="radio-choice-4" value="4"  />
+     	<label for="radio-choice-4">英語</label>
+      </fieldset>
       <div data-role="fieldcontain">
 	<ul data-role="listview" id="sansyoulist">
-	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
-	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
-	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
-	  <li><div class="ui-grid-a"><div class="ui-block-a" style="width:30%;"><input type="radio" name="sr1"/></div><div class="ui-block-b" >おさちゃん</div></div></li>
 	  <li>
 	    <div class="ui-grid-a">
 	      <div class="ui-block-a">
