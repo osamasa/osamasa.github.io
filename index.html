@@ -4,16 +4,24 @@
 <title>フォーム</title>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
-<link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"/>
-<link rel="stylesheet" href="custom.css"/>
-<script src="jquery.js"></script>
-<script src="jquery.mobile-1.4.0.min.js"></script>
 <style type="text/css">
 .containing-element .ui-slider-switch { width: 9em }
 .ph-tap{}
 .ph-tapped{ background: #6495ed }
+
+#menu { display: none; }
+#menu a { background: #CCC; color: #333; font-weight: bold; padding: 5px 10px; border: none; }
+#menu a:hover { background: #aaa; } 
 </style>
+
+<link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"/>
+<link rel="stylesheet" href="custom.css"/>
+<link rel="stylesheet" href="srobbin-jquery-pageslide-d00801f/jquery.pageslide.css"/>
+<script src="jquery.js"></script>
+<script src="jquery.mobile-1.4.0.min.js"></script>
+
 <script type="text/javascript">
+  var g_mygamenid='#s1';
   var game_num=0;
   var maxloop=5;
   var g_strLeft=''
@@ -387,6 +395,20 @@ var memberctrl = new MemberCtrl();
      setDialogOpen();
   }
 
+  function initMemberCtrl() {
+       memberctrl.init(g_dobules);
+
+       $('li.clmem').each(function(){
+          var txtid = '#' + $(this).attr('id') + ' input';
+          var inpval = $(txtid).val();
+          if((typeof inpval != 'undefined') && (inpval != null) && (inpval.length > 0)) {
+            var hthreetxt = '#' + $(this).attr('id') + ' h3';
+            var hnum = parseInt($(hthreetxt).text());
+            memberctrl.addMember(hnum, inpval);
+          }
+       });
+  }
+
   function setMailBun() {
       var now = new Date();
       var y   = now.getFullYear();
@@ -451,6 +473,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageshow', "#s1",function() {
+     g_mygamenid = '#s1';
      game_num=0;
      if(games != null) {
         games = null;
@@ -459,12 +482,14 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageshow', "#s2",function() {
+     g_mygamenid = '#s2';
      listRefreshFunc();
      setDialogOpen();
    });
 
    $(document).on('pageinit','#s1',function() {
      $(".nextgame").click(function(){
+
        var ninzu = $('#select-choice-1').val();
        do_command(ninzu);
      });
@@ -473,6 +498,7 @@ var memberctrl = new MemberCtrl();
    $(document).on('pageinit','#s2',function() {
 
      $(".prevgame").click(function(){
+
       game_num = game_num - (maxloop * 2);
       if(game_num < 0) {
          game_num = 0;
@@ -484,22 +510,13 @@ var memberctrl = new MemberCtrl();
      });
 
      $(".setmailbun").click(function() {
-       memberctrl.init(g_dobules);
-
-       $('li.clmem').each(function(){
-          var txtid = '#' + $(this).attr('id') + ' input';
-          var inpval = $(txtid).val();
-          if((typeof inpval != 'undefined') && (inpval != null) && (inpval.length > 0)) {
-            var hthreetxt = '#' + $(this).attr('id') + ' h3';
-            var hnum = parseInt($(hthreetxt).text());
-            memberctrl.addMember(hnum, inpval);
-          }
-       });
-       $.mobile.changePage('#s3');
+       initMemberCtrl();
+       $.mobile.changePage("#s3");
      });
    });
 
    $(document).on('pageshow','#s4', function() {
+      g_mygamenid = '#s4';
       var ninzu = $('#select-choice-1').val();
       ninzu++;
       var maxnum = 30;
@@ -513,7 +530,6 @@ var memberctrl = new MemberCtrl();
 
    $(document).on('pageshow','#dialog', function() {
        $('#dialogsettei').click(function() {
-
 
           var r1 = $('[name=r1]:checked').val();
           var jibun = '#' + g_nowGameNum + '_' + g_strLeft;
@@ -552,6 +568,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageshow','#s3', function() {
+     g_mygamenid = '#s3';
      setMailBun();
    });
 
@@ -575,7 +592,8 @@ var memberctrl = new MemberCtrl();
   <div data-role="page" id="s1">
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
     <div data-role="content">
       <form>
@@ -642,12 +660,11 @@ var memberctrl = new MemberCtrl();
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
-
   <div data-role="page" id="s2">
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-role="button" class="ui-btn-right">メール</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
     <div data-role="content">
       <div class="content-primary main-content">
@@ -774,8 +791,8 @@ var memberctrl = new MemberCtrl();
   <div data-role="page" id="s3">
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s2" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
     <div data-role="content">
       <h2>メール文</h2>
@@ -795,7 +812,7 @@ var memberctrl = new MemberCtrl();
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+      <a data-icon="back" data-rel="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
     </div>
     <div data-role="content">
       <h2>メンバー割付</h2>
@@ -877,6 +894,28 @@ var memberctrl = new MemberCtrl();
 	</ul>
       </div>
     </div>
+
+  </div>
+    <script src="srobbin-jquery-pageslide-d00801f/jquery.pageslide.js"></script>
+    <div id="menu">
+      <h2>途中経過</h2>
+      <div data-role="fieldcontain" id="slidesyouhai">
+	<p>長田(1)&nbsp;3勝4負1分</p>
+	<p>田中(2)&nbsp;3勝4負1分</p>
+	<p>3&nbsp;3勝4負1分</p>
+      </div>
+      <hr size="2" color="#999999" style="border" />
+      <h2>操作メニュー</h2>
+      <div data-role="fieldcontain" id="slidemenu">
+	<p><a href="#s1">設定画面</a></p>
+	<p><a href="#s4">番号割付</a></p>
+	<p><a href="#s3">メール</a></p>
+	<p><a href="javascript:$.pageslide.close()">Close</a></p>
+      </div>
+    </div>
+    <script>
+        $(".menu").pageslide({ modal : false });
+    </script>
   </div>
 </body>
 </html>
