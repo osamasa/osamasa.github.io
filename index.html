@@ -31,7 +31,7 @@
   var g_gameindex = 0;
   var g_lastGameindex = 0;
   var g_men =0;
-  var g_dobules=false;
+  var g_doubles=false;
 
 var MemberCls = function(id,name) {
     this.id = id;
@@ -315,7 +315,7 @@ var memberctrl = new MemberCtrl();
        var strTaisen = g_strLeft + ' VS ' + g_strRight;
        var strLeft = g_strLeft;
        var strRight = g_strRight;
-       if(g_dobules==true) {
+       if(g_doubles==true) {
          strLeft = g_strLeft.replace('_',' ');
          strRight = g_strRight.replace('_',' ');
        }
@@ -384,21 +384,32 @@ var memberctrl = new MemberCtrl();
     }
   }
 
+  function setDoublesFlg() {
+     var doubles = $('#flip-min').val();
+     g_doubles = (doubles == 1 ? true : false);
+  }
+
+  function getNinzu() {
+     return parseInt($('#select-choice-1').val());
+  }
+
+  function getMensu() {
+     return parseInt($('#select-choice-2').val());
+  }
+
   function setGameList(kumiawase) {
 
-     var men = $('#select-choice-2').val();
-     var ninzu = $('#select-choice-1').val();
+     var men = getMensu();
+     var ninzu = getNinzu();
+     setDoublesFlg();
 
-     var doubles = $('#flip-min').val();
-     g_dobules = (doubles == 1 ? true : false);
-
-     if(men > Math.floor(ninzu / (doubles == 1 ? 4 : 2))) {
-        men = Math.floor(ninzu / (doubles == 1 ? 4 : 2));
+     if(men > Math.floor(ninzu / (g_doubles == 1 ? 4 : 2))) {
+        men = Math.floor(ninzu / (g_doubles == 1 ? 4 : 2));
      }
 
      g_men = men;
 
-     var ret = getKumiawaseFromNum(kumiawase,men,ninzu,doubles,game_num,maxloop);
+     var ret = getKumiawaseFromNum(kumiawase,men,ninzu,g_doubles,game_num,maxloop);
 
      // 表示
      var text='';
@@ -407,7 +418,7 @@ var memberctrl = new MemberCtrl();
        text += '<li data-role="list-divider">第' + (game_num+i+1) + '試合</li>';
        for(var l=0;l<men;l++) {
          text += '<li class="ph-tap" data-gid="'+ (((game_num+i)*men)+l) +'" name="lishiai_' +(game_num+i+1)+'">';
-         if(doubles == 1) { 
+         if(g_doubles == 1) { 
             text += '<div class="ui-grid-d">';
             text += '<div class="ui-block-a"><div class="button-wrap"><a id="a'+((i*men)+l)+'_1'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4] + '</a></div></div>';
             text += '<div class="ui-block-b"><div class="button-wrap"><a id="a'+((i*men)+l)+'_2'+'" href="#dialog" data-role="button" data-jibunteam="'+ret[i][l*4]+'_'+ret[i][l*4+1]+'" data-aiteteam="'+ret[i][l*4+2]+'_'+ret[i][l*4+3]+'" data-shiai="'+(game_num+i+1)+'" class="ui-shadow ui-btn ui-corner-all dialogopenbtn">' + ret[i][l*4+1] + '</a></div><div id="'+(game_num+i+1)+'_'+ret[i][l*4]+'_'+ret[i][l*4+1]+'"></div></div>';
@@ -432,7 +443,7 @@ var memberctrl = new MemberCtrl();
   }
 
   function initMemberCtrl() {
-       memberctrl.init(g_dobules);
+       memberctrl.init(g_doubles);
 
        $('li.clmem').each(function(){
           var txtid = '#' + $(this).attr('id') + ' input';
@@ -445,12 +456,22 @@ var memberctrl = new MemberCtrl();
        });
   }
 
+  function initMemberCtrlForMenu() {
+       setDoublesFlg();
+       memberctrl.init(g_doubles);
+       var ninzu = getNinzu();
+       for(var i=1;i<(ninzu+1);i++) {
+            memberctrl.addMember(i, i);
+       }
+  }
+
+
   function setMailBun() {
       var now = new Date();
       var y   = now.getFullYear();
       var m   = now.getMonth()+1;
       var d   = now.getDate();
-      var shohai = new Array($('#select-choice-1').val());
+      var shohai = new Array(getNinzu());
       var text = "本日はお疲れ様でした\n\n";
       text += "本日("+y+"年"+m+"月"+d+"日"+")の試合結果をお送りします\n\n";
       if(memberctrl.getMembersNum() > 0) {
@@ -479,7 +500,7 @@ var memberctrl = new MemberCtrl();
            }
            var team1 = games[i]['team1'];
            var team2 = games[i]['team2'];
-           if(g_dobules == true) {
+           if(g_doubles == true) {
               team1 = games[i]['team1'].replace('_',' ');
               team2 = games[i]['team2'].replace('_',' ');
            }
@@ -515,6 +536,7 @@ var memberctrl = new MemberCtrl();
         games = null;
      }
      games = new Array(256);
+     memberctrl.init(g_doubles);
    });
 
    $(document).on('pageshow', "#s2",function() {
@@ -526,7 +548,7 @@ var memberctrl = new MemberCtrl();
    $(document).on('pageinit','#s1',function() {
      $(".nextgame").click(function(){
 
-       var ninzu = $('#select-choice-1').val();
+       var ninzu = getNinzu();
        do_command(ninzu);
      });
    });
@@ -541,19 +563,20 @@ var memberctrl = new MemberCtrl();
          $.mobile.changePage("#s1");
          return false;
        }
-       var ninzu = $('#select-choice-1').val();
+       var ninzu = getNinzu();
        do_command(ninzu);
      });
+   });
 
+   $(document).on('pageinit','#s4', function() {
      $(".setmailbun").click(function() {
        initMemberCtrl();
-       $.mobile.changePage("#s3");
+       $.mobile.changePage( g_mygamenid );
      });
    });
 
    $(document).on('pageshow','#s4', function() {
-      g_mygamenid = '#s4';
-      var ninzu = $('#select-choice-1').val();
+      var ninzu = getNinzu();
       ninzu++;
       var maxnum = 30;
       do {
@@ -610,12 +633,27 @@ var memberctrl = new MemberCtrl();
 
    function setMenu() {
       $('#slidesyouhai').empty();
+      var atokatazuke_flg = false;
  
-      if((games != null) && (memberctrl.members != null)) {
+      if(games != null) {
+        if(memberctrl.members == null) {
+          initMemberCtrlForMenu();
+          atokatazuke_flg = true;
+        }
         memberctrl.setResult(games);
-        html = memberctrl.getTextEnd('<p>','</p>');
-        $('#slidesyouhai').html(html);
       }
+      html = memberctrl.getTextEnd('<p>','</p>');
+      $('#slidesyouhai').html(html);
+      if(atokatazuke_flg) {
+         memberctrl.init(g_doubles);
+      }
+   }
+
+   function clickGame() {
+       if(g_mygamenid == '#s1') {
+         var ninzu = getNinzu();
+         do_command(ninzu);
+       }
    }
 
 </script>
@@ -841,10 +879,10 @@ var memberctrl = new MemberCtrl();
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
     <div data-role="content">
-      <h2>メール文</h2>
+      <h2>メール</h2>
       <div data-role="fieldcontain">
-	<a href="#s4" data-role="button" class="ui-shadow ui-btn ui-corner-all">番号割付</a>
 	<textarea name="textarea1" id="textarea1"></textarea>
+        
       </div>
     </div>
     <div data-role="footer">
@@ -857,8 +895,8 @@ var memberctrl = new MemberCtrl();
   <div data-role="page" id="s4">
     <div data-role="header" data-theme="a" id="header">
       <h1>テニス乱数表君</h1>
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a data-icon="back" data-rel="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
     <div data-role="content">
       <h2>メンバー割付</h2>
@@ -895,14 +933,7 @@ var memberctrl = new MemberCtrl();
 	  <li id="li29" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>29</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
 	  <li id="li30" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>30</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
 	  <li>
-	    <div class="ui-grid-a">
-	      <div class="ui-block-a">
-		<input type="button" class="setmailbun" id="mb1" value="決定" />
-	      </div>
-	      <div class="ui-block-b">
-		<input type="button" class="resetmailbun" id="mb2" value="戻る" />
-	      </div>
-	    </div>
+	    <input type="button" class="setmailbun" id="mb1" value="決定" />
 	  </li>
 	</ul>
       </div>
@@ -954,9 +985,9 @@ var memberctrl = new MemberCtrl();
       <h2>操作メニュー</h2>
       <div data-role="fieldcontain" id="slidemenu">
 	<p><a href="#s1">設定画面</a></p>
-	<p><a href="#s4">番号割付</a></p>
+	<p><a href="#s2" onclick="clickGame();">ゲーム</a></p>
+	<p><a href="#s4">メンバー割付</a></p>
 	<p><a href="#s3">メール</a></p>
-	<p><a href="javascript:$.pageslide.close()">Close</a></p>
       </div>
     </div>
     <script>
