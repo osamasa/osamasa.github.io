@@ -212,7 +212,6 @@ MemberCtrl.prototype.getTextEnd = function(hd,sep) {
       ret += hd + this.members[(this.members.length - i)].getTextEnd() + sep;
     } while (--i);
     return ret;
-  }
 }
 
 var memberctrl = new MemberCtrl();
@@ -248,7 +247,7 @@ var memberctrl = new MemberCtrl();
       // handle an error
       alert("err");
   }   
-
+    
   function do_command( ninzu ){
       $.ajax({
           type: "GET",
