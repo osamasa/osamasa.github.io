@@ -520,6 +520,9 @@ var memberctrl = new MemberCtrl();
       $.mobile.changePage("#s3");
   }
 
+  function sendmail() {
+     $.mobile.changePage("mailto:?subject=お疲れさまでした&body=" + $("#textarea1").text());
+  }
 
    $(document).bind("mobileinit", function(){
      // 初期値の上書き
@@ -629,6 +632,11 @@ var memberctrl = new MemberCtrl();
    $(document).on('pageshow','#s3', function() {
      g_mygamenid = '#s3';
      setMailBun();
+   });
+   $(document).on('pageinit','#s3', function() {
+     $('.sendmail').click(function() {     
+       // sendmail();
+     });
    });
 
    function setMenu() {
@@ -810,7 +818,6 @@ var memberctrl = new MemberCtrl();
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-role="button" class="ui-btn-right">メール</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
@@ -884,10 +891,11 @@ var memberctrl = new MemberCtrl();
 	<textarea name="textarea1" id="textarea1"></textarea>
         
       </div>
+<!--      <input type="button" class="sendmail" id="mb3" value="送信" /> -->
+<!--       <a href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メール </a> -->
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s2" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
@@ -940,7 +948,6 @@ var memberctrl = new MemberCtrl();
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
-      <a href="#s3" data-icon="back" data-iconpos="notext" data-direction="reverse" class="ui-btn-right jqm-back">Back</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
@@ -984,11 +991,12 @@ var memberctrl = new MemberCtrl();
       <hr size="2" color="#999999" style="border" />
       <h2>操作メニュー</h2>
       <div data-role="fieldcontain" id="slidemenu">
-	<p><a href="#s1">設定画面</a></p>
-	<p><a href="#s2" onclick="clickGame();">ゲーム</a></p>
-	<p><a href="#s4">メンバー割付</a></p>
-	<p><a href="#s3">メール</a></p>
+	<p><a href="#s2" onclick="clickGame();$.pageslide.close();">ゲーム</a></p>
+	<p><a href="#s4" onclick="$.pageslide.close();" >メンバ</a></p>
+	<p><a href="#s3" onclick="$.pageslide.close();" >メール</a></p>	
       </div>
+      <hr size="2" color="#999999" style="border" />
+      <p><a href="#s1" onClick="$.pageslide.close();">設定画面</a></p>
     </div>
     <script>
         $(".menu").pageslide({ modal : false });
