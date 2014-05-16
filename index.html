@@ -30,6 +30,7 @@
   var games = null;
   var g_gameindex = 0;
   var g_lastGameindex = 0;
+  var g_ninzu=0;
   var g_men =0;
   var g_doubles=false;
 
@@ -389,19 +390,18 @@ var memberctrl = new MemberCtrl();
      g_doubles = (doubles == 1 ? true : false);
   }
 
-  function getNinzu() {
-     return parseInt($('#select-choice-1').val());
+  function setNinzu() {
+    g_ninzu = parseInt($('#select-choice-1').val());
   }
 
-  function getMensu() {
-     return parseInt($('#select-choice-2').val());
+  function setMensu() {
+     g_men = parseInt($('#select-choice-2').val());
   }
 
   function setGameList(kumiawase) {
 
-     var men = getMensu();
-     var ninzu = getNinzu();
-     setDoublesFlg();
+     var men = g_men;
+     var ninzu = g_ninzu;
 
      if(men > Math.floor(ninzu / (g_doubles == 1 ? 4 : 2))) {
         men = Math.floor(ninzu / (g_doubles == 1 ? 4 : 2));
@@ -459,7 +459,7 @@ var memberctrl = new MemberCtrl();
   function initMemberCtrlForMenu() {
        setDoublesFlg();
        memberctrl.init(g_doubles);
-       var ninzu = getNinzu();
+       var ninzu = g_ninzu;
        for(var i=1;i<(ninzu+1);i++) {
             memberctrl.addMember(i, i);
        }
@@ -471,7 +471,7 @@ var memberctrl = new MemberCtrl();
       var y   = now.getFullYear();
       var m   = now.getMonth()+1;
       var d   = now.getDate();
-      var shohai = new Array(getNinzu());
+      var shohai = new Array(g_ninzu);
       var text = "本日はお疲れ様でした\n\n";
       text += "本日("+y+"年"+m+"月"+d+"日"+")の試合結果をお送りします\n\n";
       if(memberctrl.getMembersNum() > 0) {
@@ -534,12 +534,6 @@ var memberctrl = new MemberCtrl();
 
    $(document).on('pageshow', "#s1",function() {
      g_mygamenid = '#s1';
-     game_num=0;
-     if(games != null) {
-        games = null;
-     }
-     games = new Array(256);
-     memberctrl.init(g_doubles);
    });
 
    $(document).on('pageshow', "#s2",function() {
@@ -550,8 +544,18 @@ var memberctrl = new MemberCtrl();
 
    $(document).on('pageinit','#s1',function() {
      $(".nextgame").click(function(){
-
-       var ninzu = getNinzu();
+       if(g_mygamenid == '#s1') {
+         game_num=0;
+         if(games != null) {
+            games = null;
+         }
+         games = new Array(256);
+         setDoublesFlg();
+         setNinzu();
+         setMensu();
+         memberctrl.init(g_doubles);
+       }
+       var ninzu = g_ninzu;
        do_command(ninzu);
      });
    });
@@ -566,7 +570,7 @@ var memberctrl = new MemberCtrl();
          $.mobile.changePage("#s1");
          return false;
        }
-       var ninzu = getNinzu();
+       var ninzu = g_ninzu;
        do_command(ninzu);
      });
    });
@@ -579,7 +583,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageshow','#s4', function() {
-      var ninzu = getNinzu();
+      var ninzu = g_ninzu;
       ninzu++;
       var maxnum = 30;
       do {
@@ -658,10 +662,10 @@ var memberctrl = new MemberCtrl();
    }
 
    function clickGame() {
-       if(g_mygamenid == '#s1') {
-         var ninzu = getNinzu();
-         do_command(ninzu);
-       }
+//       if(g_mygamenid == '#s1') {
+//         var ninzu = g_ninzu;
+//         do_command(ninzu);
+//       }
    }
 
 </script>
