@@ -517,7 +517,11 @@ var memberctrl = new MemberCtrl();
       }
       text += "--\nテニス乱数表君 http://osamasa.github.io/\n";
       $("#textarea1").text(text);
-      $.mobile.changePage("#s3");
+//      $.mobile.changePage("#s3");
+      var mailbun = text.replace(/\n/g,'%0d%0a');
+      mailbun = mailbun.replace(/\s/g,'%20');
+      mailbun = mailbun.replace(/\?/g,'%3f');
+      $("a#mailtoid").attr('href',"mailto:?subject=今日のテニスの結果です&body="+mailbun);
   }
 
   function sendmail() {
@@ -894,11 +898,11 @@ var memberctrl = new MemberCtrl();
     <div data-role="content">
       <h2>メール</h2>
       <div data-role="fieldcontain">
-	<textarea name="textarea1" id="textarea1"></textarea>
+	<pre name="textarea1" id="textarea1"></pre>
         
       </div>
 <!--      <input type="button" class="sendmail" id="mb3" value="送信" /> -->
-<!--       <a href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メール </a> -->
+       <a id="mailtoid" href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メールアプリ起動</a>
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
