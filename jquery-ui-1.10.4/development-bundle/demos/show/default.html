@@ -19,9 +19,9 @@
 	<script src="../../ui/jquery.ui.effect-slide.js"></script>
 	<link rel="stylesheet" href="../demos.css">
 	<style>
-	.toggler { width: 500px; height: 200px; }
+
 	#button { padding: .5em 1em; text-decoration: none; }
-	#effect { width: 240px; height: 135px; padding: 0.4em; position: relative; }
+	#effect { width: 60%; height: 100%; padding: 0.4em; position: relative; }  
 	#effect h3 { margin: 0; padding: 0.4em; text-align: center; }
 	</style>
 	<script>
@@ -42,6 +42,7 @@
 
 			// run the effect
 			$( "#effect" ).show( selectedEffect, options, 500, callback );
+                        // $( "#effect" ).show( selectedEffect, options  );
 		};
 
 		//callback function to bring a hidden box back
@@ -66,9 +67,67 @@
 <div class="toggler">
 	<div id="effect" class="ui-widget-content ui-corner-all">
 		<h3 class="ui-widget-header ui-corner-all">Show</h3>
-		<p>
-			Etiam libero neque, luctus a, eleifend nec, semper at, lorem. Sed pede. Nulla lorem metus, adipiscing ut, luctus sed, hendrerit vitae, mi.
-		</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<p>1</p>
+		<a href="javascript:$( '#effect' ).hide();" class="ui-state-default ui-corner-all">CLOSE</a>
 	</div>
 </div>
 
@@ -89,6 +148,7 @@
 </select>
 
 <a href="#" id="button" class="ui-state-default ui-corner-all">Run Effect</a>
+<a href="javascript:$( '#effect' ).show( 'slide' );" id="tbutton ">Run T</a>
 
 <div class="demo-description">
 <p>Click the button above to preview the effect.</p>

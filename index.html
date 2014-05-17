@@ -538,6 +538,9 @@ var memberctrl = new MemberCtrl();
 
    $(document).on('pageshow', "#s1",function() {
      g_mygamenid = '#s1';
+     if(g_ninzu == 0) {
+        $('a.menu').hide();
+     }
    });
 
    $(document).on('pageshow', "#s2",function() {
@@ -547,11 +550,15 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageinit','#s1',function() {
+
      $(".nextgame").click(function(){
        if(g_mygamenid == '#s1') {
          game_num=0;
          if(games != null) {
             games = null;
+         }
+         if(g_ninzu == 0) {
+           $('a.menu').show();
          }
          games = new Array(256);
          setDoublesFlg();
