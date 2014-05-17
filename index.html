@@ -8,19 +8,15 @@
 .containing-element .ui-slider-switch { width: 9em }
 .ph-tap{}
 .ph-tapped{ background: #6495ed }
-
-#menu { display: none; }
-#menu a { background: #CCC; color: #333; font-weight: bold; padding: 5px 10px; border: none; }
-#menu a:hover { background: #aaa; } 
 </style>
 
 <link rel="stylesheet" href="jquery.mobile-1.4.0.min.css"/>
 <link rel="stylesheet" href="custom.css"/>
-<link rel="stylesheet" href="jquery.pageslide.css"/>
 <script src="jquery.js"></script>
 <script src="jquery.mobile-1.4.0.min.js"></script>
 
 <script type="text/javascript">
+
   var g_mygamenid='#s1';
   var game_num=0;
   var maxloop=5;
@@ -550,7 +546,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageinit','#s1',function() {
-
+    $('[data-role="panel"]').panel({theme:'b'});
      $(".nextgame").click(function(){
        if(g_mygamenid == '#s1') {
          game_num=0;
@@ -572,7 +568,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageinit','#s2',function() {
-
+    $('[data-role="panel"]').panel({theme:'b'});
      $(".prevgame").click(function(){
 
       game_num = game_num - (maxloop * 2);
@@ -587,6 +583,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageinit','#s4', function() {
+    $('[data-role="panel"]').panel({theme:'b'});
      $(".setmailbun").click(function() {
        initMemberCtrl();
        $.mobile.changePage( g_mygamenid );
@@ -597,12 +594,22 @@ var memberctrl = new MemberCtrl();
       var ninzu = g_ninzu;
       ninzu++;
       var maxnum = 30;
+      
+      $("li.clmem").css("display","");
+
       do {
+
         var $tmp = "li#li" + maxnum;
         $($tmp).css("display", "none");
+
       } while(ninzu < maxnum--);
-      $("#s4").page();
+
+//      $("#s4").page();
       $("#memberlist").listview('refresh');
+   });
+
+   $(document).on('pageinit','#dialog', function() {
+     $('[data-role="panel"]').panel({theme:'b'});
    });
 
    $(document).on('pageshow','#dialog', function() {
@@ -649,6 +656,7 @@ var memberctrl = new MemberCtrl();
      setMailBun();
    });
    $(document).on('pageinit','#s3', function() {
+    $('[data-role="panel"]').panel({theme:'b'});
      $('.sendmail').click(function() {     
        // sendmail();
      });
@@ -670,13 +678,6 @@ var memberctrl = new MemberCtrl();
       if(atokatazuke_flg) {
          memberctrl.init(g_doubles);
       }
-   }
-
-   function clickGame() {
-//       if(g_mygamenid == '#s1') {
-//         var ninzu = g_ninzu;
-//         do_command(ninzu);
-//       }
    }
 
 </script>
@@ -759,7 +760,7 @@ var memberctrl = new MemberCtrl();
             <option value="10">10面</option>
           </select>
 	</div>
-	<a href="#s2" class="nextgame" id="b1" data-role="button" type="button">決定</a>
+	<a href="#s2" class="nextgame ui-btn-icon-left ui-btn ui-icon-check ui-corner-all" id="b1" >決定</a>
       </form>
     </div>
     <div data-role="footer">
@@ -780,14 +781,13 @@ var memberctrl = new MemberCtrl();
 	  <li>
 	    <div class="ui-grid-a">
 	      <div class="ui-block-a">
-		<input type="button" class="nextgame" id="b2" value="もっと見る">
+		<input type="button" class="nextgame" id="b4" value="もっと見る">
 	      </div>
 	      <div class="ui-block-b">
-		<input type="button" class="prevgame" id="b3" value="戻る">
+		<input type="button" class="prevgame" id="b5" value="戻る">
 	      </div>
 	  </li>
 	</ul>
-
 	<ul data-role="listview" id="shiaiokikae">
 	  <li data-role="list-divider">第1試合</li> 
 	  <li>
@@ -818,14 +818,15 @@ var memberctrl = new MemberCtrl();
 	    </div>
 	  </li> 
 	</ul>
+
 	<ul data-role="listview" id="buttonlist">
 	  <li>
 	    <div class="ui-grid-a">
 	      <div class="ui-block-a">
-		<input type="button" class="nextgame" id="b2" value="もっと見る" />
+		<input type="button" class="nextgame" id="b2" value="もっと見る">
 	      </div>
 	      <div class="ui-block-b">
-		<input type="button" class="prevgame" id="b3" value="戻る" />
+		<input type="button" class="prevgame" id="b3" value="戻る">
 	      </div>
 	  </li>
 	</ul>
@@ -907,7 +908,7 @@ var memberctrl = new MemberCtrl();
         
       </div>
 <!--      <input type="button" class="sendmail" id="mb3" value="送信" /> -->
-       <a id="mailtoid" href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メールアプリ起動</a>
+       <a id="mailtoid" class="ui-btn-icon-left ui-btn ui-icon-check ui-corner-all" href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メールアプリ起動</a>
     </div>
     <div data-role="footer">
       <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
@@ -956,7 +957,9 @@ var memberctrl = new MemberCtrl();
 	  <li id="li29" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>29</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
 	  <li id="li30" class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3>30</h3></div><div class="ui-block-b" style="width:90%;"><input type="text" /></div></div></li>
 	  <li>
-	    <input type="button" class="setmailbun" id="mb1" value="決定" />
+	    <form>
+	    <a href="" class="setmailbun ui-btn-icon-left ui-btn ui-icon-check ui-corner-all" id="mb1" >決定</a>
+	    </form>
 	  </li>
 	</ul>
       </div>
@@ -993,29 +996,24 @@ var memberctrl = new MemberCtrl();
 	</ul>
       </div>
     </div>
-
   </div>
-    <script src="jquery.pageslide.js"></script>
-    <div id="menu">
-      <h2>途中経過</h2>
-      <div id="slidesyouhai">
-	<p>長田(1)&nbsp;3勝4負1分</p>
-	<p>田中(2)&nbsp;3勝4負1分</p>
-	<p>3&nbsp;3勝4負1分</p>
-      </div>
-      <hr size="2" color="#999999" style="border" />
-      <h2>操作メニュー</h2>
-      <div data-role="fieldcontain" id="slidemenu">
-	<p><a href="#s2" onclick="clickGame();$.pageslide.close();">ゲーム</a></p>
-	<p><a href="#s4" onclick="$.pageslide.close();" >メンバ</a></p>
-	<p><a href="#s3" onclick="$.pageslide.close();" >メール</a></p>	
-      </div>
-      <hr size="2" color="#999999" style="border" />
-      <p><a href="#s1" onClick="$.pageslide.close();">設定画面</a></p>
+  <div id="menu" data-role="panel" data-display="overlay">
+    <h2>途中経過</h2>
+    <div id="slidesyouhai">
+      <p>長田(1)&nbsp;3勝4負1分</p>
+      <p>田中(2)&nbsp;3勝4負1分</p>
+      <p>3&nbsp;3勝4負1分</p>
     </div>
-    <script>
-        $(".menu").pageslide({ modal : false });
-    </script>
+    <hr size="2" color="#999999" style="border" />
+    <h2>操作メニュー</h2>
+    <div data-role="fieldcontain" id="slidemenu">
+      <p><a href="#s2" data-rel="button" class="ui-btn ui-icon-arrow-r ui-btn-icon-right">ゲーム画面</a></p>
+      <p><a href="#s4" data-rel="button" class="ui-btn ui-icon-arrow-r ui-btn-icon-right">メンバ割付</a></p>
+      <p><a href="#s3" data-rel="button" class="ui-btn ui-icon-arrow-r ui-btn-icon-right">メール送信</a></p>	
+      <p><a href="#s1" data-rel="button" class="ui-btn ui-icon-arrow-r ui-btn-icon-right">設定画面</a></p>
+    </div>
+    <hr size="2" color="#999999" style="border" />
+    <p><a href="" data-rel="close" class="ui-btn ui-icon-delete ui-corner-all ui-btn-icon-left">閉じる</a></p>
   </div>
 </body>
 </html>
