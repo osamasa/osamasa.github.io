@@ -236,6 +236,7 @@ var memberctrl = new MemberCtrl();
       setGameKekka((game_num-maxloop)*g_men, (game_num)*g_men);
     setTimeout(function(){
       $.mobile.loading( "hide" );
+      $("li.ph-tap").css("background", "#ffffff");
       var tmp = "li.ph-tap[name='lishiai_"+ (game_num-5+1)+"']";
       $(tmp).css("background", "#6495ed");     
     }, 700);
@@ -430,7 +431,12 @@ var memberctrl = new MemberCtrl();
           text += '</div>';
        }
        text +='</li>';
-       $('#shiaiokikae').html(text);
+     }
+
+     if(game_num == 0) {
+        $('#shiaiokikae').html(text);
+     } else {
+        $('#shiaiokikae').append(text);
      }
      game_num+=5;
 
@@ -569,17 +575,6 @@ var memberctrl = new MemberCtrl();
 
    $(document).on('pageinit','#s2',function() {
     $('[data-role="panel"]').panel({theme:'b'});
-     $(".prevgame").click(function(){
-
-      game_num = game_num - (maxloop * 2);
-      if(game_num < 0) {
-         game_num = 0;
-         $.mobile.changePage("#s1");
-         return false;
-       }
-       var ninzu = g_ninzu;
-       do_command(ninzu);
-     });
    });
 
    $(document).on('pageinit','#s4', function() {
@@ -609,7 +604,7 @@ var memberctrl = new MemberCtrl();
    });
 
    $(document).on('pageinit','#dialog', function() {
-     $('[data-role="panel"]').panel({theme:'b'});
+//     $('[data-role="panel"]').panel({theme:'b'});
    });
 
    $(document).on('pageshow','#dialog', function() {
@@ -683,9 +678,17 @@ var memberctrl = new MemberCtrl();
 </script>
 </head>
 <body>
+<div id="fb-root"></div>
+<script>(function(d, s, id) {
+  var js, fjs = d.getElementsByTagName(s)[0];
+  if (d.getElementById(id)) return;
+  js = d.createElement(s); js.id = id;
+  js.src = "//connect.facebook.net/ja_JP/sdk.js#xfbml=1&version=v2.0";
+  fjs.parentNode.insertBefore(js, fjs);
+}(document, 'script', 'facebook-jssdk'));</script>
   <div data-role="dialog" id="oshirase">
     <div data-role="header">
-      <h2><div class="taisen">更新のお知らせ</div></h2>
+      <h2>更新のお知らせ</h2>
       <div data-role="content">
 	<ul>
 	  <li>2014/05/16 Ver 1.2.4 メールアプリが起動します</li>
@@ -694,8 +697,8 @@ var memberctrl = new MemberCtrl();
 	  <li>2014/03/10 Ver 1.0.0 作成公開開始</li>
 	</ul>
 	<p><a href="#s1" data-role="button" >閉じる</a></p>
-      </div>
-    </div> 
+      </div> 
+    </div>
   </div>
   <div data-role="page" id="s1">
     <div data-role="header" data-theme="a" id="header">
@@ -764,8 +767,10 @@ var memberctrl = new MemberCtrl();
       </form>
     </div>
     <div data-role="footer">
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
       <h2>Osamasa(C) 2014</h2>
+      <p>
+	<div class="fb-like" data-href="http://osamasa.github.io/" data-layout="standard" data-action="like" data-show-faces="true" data-share="true"></div>
+      </p>
     </div>
   </div>
   <div data-role="page" id="s2">
@@ -776,18 +781,6 @@ var memberctrl = new MemberCtrl();
     </div>
     <div data-role="content">
       <div class="content-primary main-content">
-
-	<ul data-role="listview" id="buttonlist">
-	  <li>
-	    <div class="ui-grid-a">
-	      <div class="ui-block-a">
-		<input type="button" class="nextgame" id="b4" value="もっと見る">
-	      </div>
-	      <div class="ui-block-b">
-		<input type="button" class="prevgame" id="b5" value="戻る">
-	      </div>
-	  </li>
-	</ul>
 	<ul data-role="listview" id="shiaiokikae">
 	  <li data-role="list-divider">第1試合</li> 
 	  <li>
@@ -818,23 +811,16 @@ var memberctrl = new MemberCtrl();
 	    </div>
 	  </li> 
 	</ul>
-
-	<ul data-role="listview" id="buttonlist">
-	  <li>
-	    <div class="ui-grid-a">
-	      <div class="ui-block-a">
-		<input type="button" class="nextgame" id="b2" value="もっと見る">
-	      </div>
-	      <div class="ui-block-b">
-		<input type="button" class="prevgame" id="b3" value="戻る">
-	      </div>
-	  </li>
-	</ul>
+	<p>
+	  <a href="" id="b2" data-rel="button" class="nextgame ui-btn ui-corner-all ui-btn-icon-left ui-icon-arrow-d">もっと見る</a>
+	  <!-- <input type="button" class="nextgame" id="b2" value="もっと見る"> -->
+	</p>
       </div>
     </div>
     <div data-role="footer">
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
       <h2>Osamasa(C) 2014</h2>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
     </div>
   </div>
 
@@ -911,7 +897,8 @@ var memberctrl = new MemberCtrl();
        <a id="mailtoid" class="ui-btn-icon-left ui-btn ui-icon-check ui-corner-all" href="mailto:?subject=お疲れ様&body=ほげほげ" data-role="button" >メールアプリ起動</a>
     </div>
     <div data-role="footer">
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
@@ -965,7 +952,8 @@ var memberctrl = new MemberCtrl();
       </div>
     </div>
     <div data-role="footer">
-      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-left jqm-home">Home</a>
+      <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
+      <a href="#s1" data-icon="home" data-iconpos="notext" data-direction="reverse" class="ui-btn-right">Home</a>
       <h2>Osamasa(C) 2014</h2>
     </div>
   </div>
