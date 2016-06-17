@@ -1,5 +1,5 @@
 $(function(){
-    var rireki = '2017061416';
+    var rireki = 'aab2017061416-8';
 
     /** CSV を JSON形式に変換する **/
     function csv2json(data){
@@ -16,7 +16,7 @@ $(function(){
 	return jsonArray;
     }
 
-    var rireki = Backbone.Model.extend({
+    var mrireki = Backbone.Model.extend({
 	defaults: function() {
 	    return {
 		id : 0,
@@ -32,8 +32,8 @@ $(function(){
     var RirekiList = Backbone.Collection.extend({
 	
 	comparator: 'id',
-	model: rireki,
-	localStorage: new Backbone.LocalStorage("ransulist")
+	model: mrireki,
+	localStorage: new Backbone.LocalStorage("ransulist"),
 	nextOrder: function() {
 	    if (!this.length) return 1;
 	    return this.first().get('id') + 1;
@@ -489,7 +489,6 @@ $(function(){
 	},
 
 	initialize: function(options) {
-
 	    if (typeof options === "undefined") {
 		options || (options = {});
 		SetteiModel.fetch();
@@ -505,21 +504,17 @@ $(function(){
 		var model ;
 		if(SetteiModel.length == 0) {
 		    model = new Settei();
+		    model.set({'id' : 0});
+		    model.set({'men' : options.men});
+		    model.set({'ninzu' : options.ninzu});
+		    model.set({'doubles': options.doubles});
+		    model.set({'to' :options.to});
+	            model.set({'limit': options.limit});
+		    SetteiModel.add(model);
 		} else {
 		    model = SetteiModel.get(0);
-		}
-		model.set({'id' : 0});
-		model.set({'men' : options.men});
-		model.set({'ninzu' : options.ninzu});
-		model.set({'doubles': options.doubles});
-		model.set({'to' :options.to});
-	        model.set({'limit': options.limit});
-		if(SetteiModel.length == 0) {
-		   SetteiModel.add(model);
-		} else {
-		    model.save();
-		}
-		this.getAjaxData();
+		    this.getAjaxData();
+		}		
 	    }
 
 	    this.on('add', this.callback);	
@@ -541,9 +536,9 @@ $(function(){
 	    Games.fetch();
 
 	    if(Games.length == 0) {
+		this.openSetteiDialog();
 		$('body').pagecontainer('change', '#s1');
 	    }
-
 	},
 
 	callback: function(){  // Collectionに追加がある度実行される
