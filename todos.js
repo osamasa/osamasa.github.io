@@ -104,7 +104,8 @@ $(function(){
 		righttwo: 0,
 		hantei: 0,
 		score_l: 0,
-		score_r: 0
+		score_r: 0,
+		shiai_num: 0
 	    };
 	},
 	// Toggle the `done` state of this todo item.
@@ -368,7 +369,7 @@ $(function(){
 	    
 	    Games.each(function(game) {		
 		if( game.get('hantei') != 0 ) {
-		    result_s += '第' + game.get('id') + "試合\n";
+		    result_s += '第' + game.get('shiai_num') + "試合\n";
 		    var r1 = "";
 		    var r2 = "";		
 
@@ -619,16 +620,17 @@ $(function(){
 				tmp[(model.get('doubles')==1 ? 4 : 2)*l+j]=kumiawase[start_index][j % 2];
 			    }
 			    start_index += 1;
+			}			
+			for(var l=0;l<model.get('men');l++) {
+			    var tmp2;
+			    if(model.get('doubles')==1) {
+				tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0+l*4], "lefttwo":tmp[1+l*4], "rightone": tmp[2+l*4], "righttwo": tmp[3+l*4] , "shiai_num" : i+1};
+			    } else {
+				tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0+l*4], "rightone": tmp[2+l*4],"shiai_num" : i+1};
+			    }
+			    Games.create(tmp2);
 			}
-			var tmp2;
-			if(model.get('doubles')==1) {
-			    tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0], "lefttwo":tmp[1], "rightone": tmp[2], "righttwo": tmp[3]};
-			} else {
-			    tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0], "rightone": tmp[2]};
-			}
-			Games.create(tmp2);
 		    }
-
 		},
 		error: function(data, status) {
 		    alert (status + ":" + data );
