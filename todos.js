@@ -1,4 +1,6 @@
 $(function(){
+    var rireki = '2017061416';
+
     /** CSV を JSON形式に変換する **/
     function csv2json(data){
 	var jsonArray = [];
@@ -13,6 +15,33 @@ $(function(){
 	}
 	return jsonArray;
     }
+
+    var rireki = Backbone.Model.extend({
+	defaults: function() {
+	    return {
+		id : 0,
+		date : null,
+		note : null
+	    };
+	},
+	makeRirekiStr: function () {
+	    return this.date.getFullYear() + ("0" + (this.date.getMonth()+1)).substr(-2) + + ("0" + (this.date.getDate())).substr(-2) + ("0" + (this.date.getHours())).substr(-2);
+	}
+    });
+
+    var RirekiList = Backbone.Collection.extend({
+	
+	comparator: 'id',
+	model: rireki,
+	localStorage: new Backbone.LocalStorage("ransulist")
+	nextOrder: function() {
+	    if (!this.length) return 1;
+	    return this.first().get('id') + 1;
+	},
+	comparator : function(a, b) { 
+	    return (b.get('date') > a.get('date') ? 1 : -1);
+	}
+    });
 
     var Settei = Backbone.Model.extend({
 	defaults: function() {
@@ -30,7 +59,7 @@ $(function(){
     var SetteiList = Backbone.Collection.extend({
 	comparator: 'id',
 	model: Settei,
-	localStorage: new Backbone.LocalStorage("kransuhyoukun")
+	localStorage: new Backbone.LocalStorage("kransuhyoukun" + rireki)
     });
 
     var SetteiModel = new SetteiList();
@@ -44,11 +73,7 @@ $(function(){
 		losenum:0,
 		drawnum:0
 	    };
-	},
-//	saveGame: function( _m ) {
-//	    alert(_m);
-//	    this.save({member_name: _m});
-//	}
+	}
     });
 
     var MemberList = Backbone.Collection.extend({
@@ -59,7 +84,7 @@ $(function(){
 	model: Member,
 
 	// Save all of the todo items under the `"todos-backbone"` namespace.
-	localStorage: new Backbone.LocalStorage("mransuhyoukun"),
+	localStorage: new Backbone.LocalStorage("mransuhyoukun" + rireki),
 
 	nextOrder: function() {
 	    if (!this.length) return 1;
@@ -102,7 +127,7 @@ $(function(){
 	model: Game,
 
 	// Save all of the todo items under the `"todos-backbone"` namespace.
-	localStorage: new Backbone.LocalStorage("ransuhyoukun"),
+	localStorage: new Backbone.LocalStorage("ransuhyoukun" + rireki),
 
 	nextOrder: function() {
 	    if (!this.length) return 1;
