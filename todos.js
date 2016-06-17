@@ -14,6 +14,27 @@ $(function(){
 	return jsonArray;
     }
 
+    var Settei = Backbone.Model.extend({
+	defaults: function() {
+	    return {
+		id : 0,
+		men : 1,
+		ninzu : 4,
+		doubles : 1,
+		to : 0,
+		limit : 5
+	    };
+	}
+    });
+
+    var SetteiList = Backbone.Collection.extend({
+	comparator: 'id',
+	model: Settei,
+	localStorage: new Backbone.LocalStorage("kransuhyoukun")
+    });
+
+    var SetteiModel = new SetteiList();
+
     var Member = Backbone.Model.extend({
 	defaults: function() {
 	    return {
@@ -92,6 +113,28 @@ $(function(){
 	    this.model
 	}
     });    
+
+    var SetteiGamenView = Backbone.View.extend({
+	template: _.template($('#sdialog-template').html()),
+
+	model: Settei,
+
+	bindings: {
+	    '#flip-min' : 'doubles',
+	    '#select-choice-1' : 'ninzu',
+	    '#select-choice-2' : 'men',
+	},
+
+	initialize: function() {
+	},
+
+	render: function() {
+//	    this.model = SetteiModel.get(0);
+	    this.$el.html(this.template(this.model.toJSON()));
+	    this.stickit();
+	    return this;
+	},
+    });
 
 
     var DialogView = Backbone.View.extend({
@@ -356,6 +399,7 @@ $(function(){
 	// Delegated events for creating new items, and clearing completed ones.
 	// 新タスクの作成のイベントなど、AppViewで監視するイベントなどなど
 	events: {
+	    "click #sb1": "openSetteiDialog",
 	    "click #b1":  "setGames",
 	    "click #b2":  "createOnEnter",
 	    "click #sb3":  "OpenMailDialog",
@@ -363,12 +407,6 @@ $(function(){
 	    "click #clear-completed": "clearCompleted",
 	    "click #toggle-all": "toggleAllComplete"
 	},
-
-	men : 1,
-	ninzu : 4,
-	doubles : 1,
-	to : 0,
-	limit : 0,
 
 	// At initialization we bind to the relevant events on the `Games`
 	// collection, when items are added or changed. Kick things off by
@@ -380,13 +418,26 @@ $(function(){
 	    var mailview = new MailView();
 	    this.$("div#s4contes").html(mailview.render().el).trigger("create");
 	},
-	
+	openSetteiDialog: function() {
+	    var sgv = new SetteiGamenView( {model: SetteiModel.get(0)} );
+	    this.$("div#s1contents").html(sgv.render().el).trigger("create");
+	},
+
 	setGames: function(options) {
-	    this.men = $("#select-choice-2").val();
-	    this.ninzu = $("#select-choice-1").val();
-	    this.doubles = $("#flip-min").val();
-	    this.to = 0;
-	    this.limit = 5;
+
+	    if(SetteiModel.length > 0) {
+		var model;
+		while (model = SetteiModel.first()) {
+		    model.destroy();
+		}
+	    }
+
+	    SetteiModel.create({'id': 0,
+				'men' :  $("#select-choice-2").val(), 
+				'ninzu' : $("#select-choice-1").val(),
+				'doubles': $("#flip-min").val(),
+				'to' : 0,
+				'limit': 5});
 
 	    if(Members.length > 0) {
 		var model;
@@ -397,7 +448,7 @@ $(function(){
 
 	    this.$("#memberlist").empty();
 
-	    for(var i=0;i<this.ninzu;i++) {
+	    for(var i=0;i<SetteiModel.get(0).get('ninzu');i++) {
 		Members.create({"id": Members.nextOrder()});
 	    }
 
@@ -416,12 +467,33 @@ $(function(){
 
 	    if (typeof options === "undefined") {
 		options || (options = {});
+		SetteiModel.fetch();
+		if(SetteiModel.length == 0) {
+		    SetteiModel.create({'id' : 0,
+					'men' : 1,
+					'ninzu' : 4,
+					'doubles': 1,
+					'to' : 0,
+					'limit': 5});
+		}
 	    } else {
-		this.men = options.men;
-		this.ninzu = options.ninzu;
-		this.doubles = options.doubles;
-		this.to = options.to;
-		this.limit = options.limit;
+		var model ;
+		if(SetteiModel.length == 0) {
+		    model = new Settei();
+		} else {
+		    model = SetteiModel.get(0);
+		}
+		model.set({'id' : 0});
+		model.set({'men' : options.men});
+		model.set({'ninzu' : options.ninzu});
+		model.set({'doubles': options.doubles});
+		model.set({'to' :options.to});
+	        model.set({'limit': options.limit});
+		if(SetteiModel.length == 0) {
+		   SetteiModel.add(model);
+		} else {
+		    model.save();
+		}
 		this.getAjaxData();
 	    }
 
@@ -485,48 +557,51 @@ $(function(){
 	// Create
 	//
 	createOnEnter: function() {
-	    this.to = Games.nextOrder() - 1;
+	    var model = SetteiModel.get(0);
+	    model.set({'to' : Games.nextOrder()-1});
+	    model.save();
 	    this.getAjaxData()
 	},
 
 	getAjaxData: function() {
-	    var myview = this;
+//	    var myview = this;
+	    var model = SetteiModel.get(0);
 	    $.ajax({
 		type: "GET",
-		url: myview.ninzu + ".csv",
+		url: model.get('ninzu') + ".csv",
 		cache: false,
 		success: function(data, status) {
-		    var ret = new Array(myview.limit);
+		    var ret = new Array(model.get('limit'));
 		    var kumiawase = csv2json(data);
 
 		    
-		    if(myview.men > Math.floor(myview.ninzu / (myview.doubles ==1 ? 4 : 2))) {
-			myview.men = Math.floor(myview.ninzu / (myview.doubles== 1 ? 4 : 2));
+		    if(model.get('men') > Math.floor(model.get('ninzu') / (model.get('doubles') ==1 ? 4 : 2))) {
+			model.get('men') = Math.floor(model.get('ninzu') / (model.get('doubles')== 1 ? 4 : 2));
 		    }
-		    var okuri = (myview.doubles == 1 ? 2 : 1) * myview.men;
+		    var okuri = (model.get('doubles') == 1 ? 2 : 1) * model.get('men');
 		    var kai=0;
 
-		    var start_index = myview.to * okuri;
+		    var start_index = model.get('to') * okuri;
 		    if(start_index >= kumiawase.length) {
 			start_index = start_index % kumiawase.length;
 		    }
 
-		    for(var i=0;i<myview.limit ;i++) {
-			var tmp = new Array((myview.doubles==1 ? 4 : 2) * myview.men);
-			for(var l=0;l<myview.men;l++) {
-			    for(var j=0;j<(myview.doubles==1 ? 4 : 2);j++) {
-				if((myview.doubles==1) && (j==2)) {
+		    for(var i=0;i<model.get('limit') ;i++) {
+			var tmp = new Array((model.get('doubles')==1 ? 4 : 2) * model.get('men'));
+			for(var l=0;l<model.get('men');l++) {
+			    for(var j=0;j<(model.get('doubles')==1 ? 4 : 2);j++) {
+				if((model.get('doubles')==1) && (j==2)) {
 				    start_index += 1;
 				}
 				if(start_index >= kumiawase.length) {
 				    start_index = 0;
 				}
-				tmp[(myview.doubles==1 ? 4 : 2)*l+j]=kumiawase[start_index][j % 2];
+				tmp[(model.get('doubles')==1 ? 4 : 2)*l+j]=kumiawase[start_index][j % 2];
 			    }
 			    start_index += 1;
 			}
 			var tmp2;
-			if(myview.doubles==1) {
+			if(model.get('doubles')==1) {
 			    tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0], "lefttwo":tmp[1], "rightone": tmp[2], "righttwo": tmp[3]};
 			} else {
 			    tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0], "rightone": tmp[2]};

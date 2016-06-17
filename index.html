@@ -65,7 +65,111 @@
 <div data-role="header">
   <h2>ゲーム設定</h2>
 </div>
-<div id="s1contents" data-role="content">
+<div id="s1contents" data-role="content"></div>  
+</div>
+
+<div data-dialog="true" data-role="page" id="s3">
+<div data-role="header">
+  <h2>メンバー割付</h2>
+</div>     
+<div id="s3contes" data-role="content">
+    <div data-role="fieldcontain">
+      <ul data-role="listview" id="memberlist" data-inset="true">
+      </ul>
+    </div>
+<div class="ui-grid-a">
+<div class="ui-block-a">
+  <p><a data-role="button" href="#s2" id="b4">決定</a></p>
+</div>
+<div class="ui-block-b">
+  <p><a data-role="button" data-rel="back">キャンセル</a></p>
+</div>
+</div>    
+  </div>
+</div>
+
+<div data-dialog="true" data-role="page" id="s4">
+<div data-role="header">
+  <h2>コピーしてお使いください</h2>
+</div>   
+<div id="s4contes" data-role="content">
+</div>
+<p><a data-role="button" data-rel="back">閉じる</a></p>
+</div>
+
+<script type="text/template" id="mailbun-template">
+  <div data-role="content">
+    <div data-role="fieldcontain">
+      <pre name="textarea1" id="textarea1">
+本日はお疲れ様でした
+本日(<%= year %>年<%= mon %>月<%= day %>日)の試合結果をお送りします
+
+<%= result_s %>
+
+<%= result_p %>
+
+--
+テニス乱数表君V2 http://osamasa.github.io/
+      </pre>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/template" id="mitem-template">
+  <li class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3><%= id %></h3></div><div class="ui-block-b" style="width:90%;"><input name="member_name" type="text" value="<%= member_name %>" id="member_<%= id %>" /></div></div></li>
+</script>
+
+<script type="text/template" id="item-template">
+
+<div  data-role="list-divider"  class="ui-li-divider ui-bar-inherit ui-first-child">第<%= id %>試合</div>
+<div class="score ph-tap ui-grid-d" data-gid="<%= id %>">
+
+<div class="ui-block-a"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= leftone %></a>
+<% if(hantei>0) { %>
+<div align="right">
+  <%= score_l %>
+</div>
+<% } %>	
+</div>
+<div class="ui-block-b" ><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= lefttwo %></a></div>
+<% if(hantei) { %>
+<div>
+  <% if(hantei == 1) { %>○<% }%>
+  <% if(hantei == 2) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>	
+</div>	
+<div class="ui-block-c"></div>
+<div class="ui-block-d"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= rightone %></a></div>
+<% if(hantei) { %>
+<div align="right">
+  <% if(hantei == 2) { %>○<% }%>
+  <% if(hantei == 1) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>
+</div>
+<div class="ui-block-e"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= righttwo %></a></div>
+<% if(hantei>0) { %>
+<div>
+  <%= score_r %>
+</div>
+<% } %>
+</div>
+</div>
+</div>
+</script>
+
+<script type="text/template" id="stats-template">
+<% if (done) { %>
+<a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+<% } %>
+<div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
+</script>
+
+<script type="text/template" id="sdialog-template">
 <div class="containing-element">
   <label for="flip-min">ゲーム形式:</label>
   <select name="slider" id="flip-min" data-role="slider">
@@ -130,108 +234,6 @@
 <div class="ui-block-b">
   <p><a data-role="button" data-rel="back">キャンセル</a></p>
 </div>
-</div>  
-</div>
-
-<div data-dialog="true" data-role="page" id="s3">
-<div data-role="header">
-  <h2>メンバー割付</h2>
-</div>     
-<div id="s3contes" data-role="content">
-    <div data-role="fieldcontain">
-      <ul data-role="listview" id="memberlist" data-inset="true">
-      </ul>
-    </div>
-<div class="ui-grid-a">
-<div class="ui-block-a">
-  <p><a data-role="button" href="#s2" id="b4">決定</a></p>
-</div>
-<div class="ui-block-b">
-  <p><a data-role="button" data-rel="back">キャンセル</a></p>
-</div>
-</div>    
-  </div>
-</div>
-
-<div data-dialog="true" data-role="page" id="s4">
-<div data-role="header">
-  <h2>コピーしてお使いください</h2>
-</div>   
-<div id="s4contes" data-role="content">
-</div>
-<p><a data-role="button" data-rel="back">閉じる</a></p>
-</div>
-
-<script type="text/template" id="mailbun-template">
-  <div data-role="content">
-    <div data-role="fieldcontain">
-      <pre name="textarea1" id="textarea1">
-本日はお疲れ様でした
-本日(<%= year %>年<%= mon %>月<%= day %>日の試合結果をお送りします
-
-<%= result_s %>
-
-<%= result_p %>
-
---
-テニス乱数表君V2 http://osamasa.github.io/
-      </pre>
-    </div>
-  </div>
-</script>
-
-
-<script type="text/template" id="mitem-template">
-  <li class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3><%= id %></h3></div><div class="ui-block-b" style="width:90%;"><input name="member_name" type="text" value="<%= member_name %>" id="member_<%= id %>" /></div></div></li>
-</script>
-
-<script type="text/template" id="item-template">
-
-<div  data-role="list-divider"  class="ui-li-divider ui-bar-inherit ui-first-child">第<%= id %>試合</div>
-<div class="score ph-tap ui-grid-d" data-gid="<%= id %>">
-
-<div class="ui-block-a"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= leftone %></a>
-<% if(hantei>0) { %>
-<div align="right">
-  <%= score_l %>
-</div>
-<% } %>	
-</div>
-<div class="ui-block-b" ><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= lefttwo %></a></div>
-<% if(hantei) { %>
-<div>
-  <% if(hantei == 1) { %>○<% }%>
-  <% if(hantei == 2) { %>×<% }%>	
-  <% if(hantei == 3) { %>△<% }%>
-</div>
-<% } %>	
-</div>	
-<div class="ui-block-c"></div>
-<div class="ui-block-d"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= rightone %></a></div>
-<% if(hantei) { %>
-<div align="right">
-  <% if(hantei == 2) { %>○<% }%>
-  <% if(hantei == 1) { %>×<% }%>	
-  <% if(hantei == 3) { %>△<% }%>
-</div>
-<% } %>	
-</div>
-<div class="ui-block-e"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= righttwo %></a></div>
-<% if(hantei>0) { %>
-<div>
-  <%= score_r %>
-</div>
-<% } %>	
-</div>
-</div>
-</div>
-</script>
-
-<script type="text/template" id="stats-template">
-<% if (done) { %>
-<a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
-<% } %>
-<div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
 </script>
 
 <script type="text/template" id="dialog-template">
