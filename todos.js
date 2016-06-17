@@ -626,7 +626,7 @@ $(function(){
 			    if(model.get('doubles')==1) {
 				tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0+l*4], "lefttwo":tmp[1+l*4], "rightone": tmp[2+l*4], "righttwo": tmp[3+l*4] , "shiai_num" : i+1};
 			    } else {
-				tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0+l*4], "rightone": tmp[2+l*4],"shiai_num" : i+1};
+				tmp2 = {"id": Games.nextOrder(),"leftone": tmp[0+l*2], "rightone": tmp[1+l*2],"shiai_num" : i+1};
 			    }
 			    Games.create(tmp2);
 			}
