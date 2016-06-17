@@ -239,6 +239,7 @@ $(function(){
 	id: function(){ return _.uniqueId("fshiai"); },
 
 	template: _.template($('#item-template').html()),
+	template_s: _.template($('#item-template-s').html()),
 
 	writng_flg : false,
 
@@ -267,7 +268,11 @@ $(function(){
 	// Re-render the titles of the todo item.
 	// Modelの内容をHTMLに落としこむ関数
 	render: function() {
-	    this.$el.html(this.template(this.model.toJSON()));
+	    if(SetteiModel.get(0).get('doubles')==1) {
+		this.$el.html(this.template(this.model.toJSON()));
+	    } else {
+		this.$el.html(this.template_s(this.model.toJSON()));
+	    }
 	    this.stickit();
 	    return this;
 	},
