@@ -109,7 +109,8 @@
 <%= result_p %>
 
 --
-テニス乱数表君V2 http://osamasa.github.io/
+テニス乱数表君V2
+http://osamasa.github.io/
       </pre>
     </div>
   </div>
@@ -161,6 +162,37 @@
 </div>
 </div>
 </script>
+
+<script type="text/template" id="item-template-s">
+
+<div  data-role="list-divider"  class="ui-li-divider ui-bar-inherit ui-first-child">第<%= shiai_num %>試合</div>
+<div class="score ph-tap ui-grid-b" data-gid="<%= id %>">
+
+<div class="ui-block-a"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= leftone %></a>
+<% if(hantei>0) { %>
+<div align="right">
+  <%= score_l %>
+  <% if(hantei == 1) { %>○<% }%>
+  <% if(hantei == 2) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>	
+</div>
+<div class="ui-block-b"></div>
+<div class="ui-block-c"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= rightone %></a></div>
+<% if(hantei) { %>
+<div align="left">
+  <% if(hantei == 2) { %>○<% }%>
+  <% if(hantei == 1) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+  <%= score_r %>
+</div>
+<% } %>
+</div>
+</div>
+</div>
+</script>
+
 
 <script type="text/template" id="stats-template">
 <% if (done) { %>
@@ -243,15 +275,15 @@
   <input type="radio" name="hantei" id="r1" value="0" checked="checked" />
   <label for="r1">-</label>
   <input type="radio" name="hantei" id="r2" value="1" />
-  <label for="r2"><div class="left_t_win"><%= leftone %><%= lefttwo %>の勝ち</div></label>
+  <label for="r2"><div class="left_t_win"><%= leftone %><% if (lefttwo) {%><%= lefttwo %><% } %>の勝ち</div></label>
   <input type="radio" name="hantei" id="r3" value="2" />
-  <label for="r3"><div class="right_t_win"><%= rightone %><%= righttwo %>の勝ち</div></label>
+  <label for="r3"><div class="right_t_win"><%= rightone %><% if(righttwo) {%><%= righttwo %><% } %>の勝ち</div></label>
   <input type="radio" name="hantei" id="r4" value="3" />
   <label for="r4">引き分け</label>
   </fieldset>
   <div class="ui-grid-a">
   <div class="ui-block-a">
-    <label for="select-choice-10" class="select"><div class="left_t_tensu"><%= leftone %> <%= lefttwo %>の点数</div></label>
+    <label for="select-choice-10" class="select"><div class="left_t_tensu"><%= leftone %> <% if (lefttwo) { %><%= lefttwo %><% } %>の点数</div></label>
     
     <select name="select-choice-10" id="select-choice-10">
       <option value="-1">-</option>
@@ -267,7 +299,7 @@
     </select>
   </div>
   <div class="ui-block-b">
-    <label for="select-choice-11" class="select"><div class="right_t_tensu"><%= rightone %> <%= righttwo %>の点数</div></label>
+    <label for="select-choice-11" class="select"><div class="right_t_tensu"><%= rightone %> <% if(righttwo) { %><%= righttwo %><% } %>の点数</div></label>
     <select name="select-choice-11" id="select-choice-11">
       <option value="-1">-</option>
       <option value="0">0</option>
