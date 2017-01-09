@@ -28,7 +28,8 @@
 <div data-role="panel" id="menu" data-theme="b">
   <ul data-role="listview">
     <li data-role="list-divider">サービス</li>
-    <li><a id="sb1" href="#s1" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">設定</a></li>
+    <li><a id="sb1" href="#s1" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">設定に戻る</a></li>
+    <li><a id="sb4" href="#s5" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">じゃんけん</a></li>
     <li><a href="#s3" id="sb2" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メンバー割</a></li>
     <li><a href="#s4" id="sb3" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メール</a></li>
   </ul>
@@ -96,6 +97,23 @@
 </div>
 <p><a data-role="button" data-rel="back">閉じる</a></p>
 </div>
+
+<div data-dialog="true" data-role="page" id="s5">
+  <div data-role="header">
+    <h2>乱数割付君</h2>
+  </div>
+  <!-- Task一覧部分 -->
+  <div id="tasks" data-role="content">
+  </div>
+
+  <p><a data-role="button" data-rel="back">閉じる</a></p>
+</div>
+
+<script type="text/template" id="task-template">
+  <div class="ui-bar ui-bar-a" style="height:60px text-align:center; ">
+    <input type="button" value="<%= title %>" n-data="<%= number %>">
+  </div>
+</script>
 
 <script type="text/template" id="mailbun-template">
   <div data-role="content">

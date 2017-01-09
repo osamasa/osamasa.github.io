@@ -1,6 +1,21 @@
 $(function(){
+    var gRANSUARRAY = [];
     var rireki = 'aab2017061416-8';
 
+    // 乱数作成関数
+    function getRandomNum( max , snum) {
+	for(var i = 0; i < max; i++) {
+	    if(gRANSUARRAY[i] === undefined) {
+		gRANSUARRAY[i] = snum;
+		return snum;
+	    } else if(gRANSUARRAY[i] == snum) {
+		snum=getRandomNum( max , Math.floor( Math.random() * max + 1));
+		return snum;
+	    }
+	}
+	return snum;
+    }    
+    
     /** CSV を JSON形式に変換する **/
     function csv2json(data){
 	var jsonArray = [];
@@ -16,6 +31,76 @@ $(function(){
 	return jsonArray;
     }
 
+    ///Model
+    var Task = Backbone.Model.extend({
+	initialize: function(){
+	}});
+
+    ///Collection
+    var Tasks = Backbone.Collection.extend({ model: Task })
+
+    ///View
+    //Task一覧部分
+    var TaskView = Backbone.View.extend({
+	　　//Viewのルート要素を指定します。
+	//削除イベント
+	tagName : "div",
+	initialize: function(){　　
+			       //「Task一覧部分」でタスクが削除されたときremoveメソッドを起動しています。
+			       //modelも削除する
+			       this.model.on('destroy', this.remove, this);
+			      },
+	events: {
+	    　　　　　//ルート内のクラス名deleteがclickされたときdestroyメソッドを起動します。
+            'click input':'shownumber'
+	},
+	shownumber: function(){
+            alert(this.model.get('number'));
+	    this.$el.find('input').remove();
+	    this.$el.html('<p style="text-align:center; font-weight:bold;">' + this.model.get('number') + '</p>');
+	    
+	},
+	remove: function(){
+	    　　　　//$elはViewのルート要素です。
+            this.$el.remove();
+	},
+	/*
+	  _.templateはunderscore.js の機能で、画面テンプレートを生成するfunctionを返します。
+	*/
+	template: _.template($('#task-template').html()),
+	render: function(){
+            //modelをtemplateに渡す
+	    var template = this.template(this.model.toJSON());
+            this.$el.html(template);
+	    this.$el.attr('id', 'btn' + this.model.get('id'));
+	    this.$el.attr('class', 'ui-block-' + this.model.get('alphabet'));
+            return this;
+	}
+    });
+
+    var TasksView = Backbone.View.extend({
+	　　//登録フォームでタスクが追加されたらaddNewメソッドを起動しています。
+	tagName: 'fieldset',
+	className: 'ui-grid-c',
+	initialize: function(){
+	    　　　　//this.collectionはインスタンス生成時のCollectionです。
+            this.collection.on('add', this.addNew, this);
+
+	},
+	addNew: function(task){
+            var taskView = new TaskView({model: task});
+            this.$el.append(taskView.render().el);
+	},
+	render: function(){
+            this.collection.each(function(task){
+		var taskView = new TaskView({model: task});
+		var a = taskView.render().el;
+		this.$el.append(taskView.render().el);
+            },this);
+            return this;
+	}
+    });
+    
     var mrireki = Backbone.Model.extend({
 	defaults: function() {
 	    return {
@@ -434,6 +519,7 @@ $(function(){
 	    "click #b1":  "setGames",
 	    "click #b2":  "createOnEnter",
 	    "click #sb3":  "OpenMailDialog",
+	    "click #sb4":  "OpenJankenDialog",
 	    "click #b4":  "saveAllModel",
 	    "click #clear-completed": "clearCompleted",
 	    "click #toggle-all": "toggleAllComplete"
@@ -445,6 +531,30 @@ $(function(){
 	// CollectionのイベントをlistenToすることで、Viewをrenderする算段
 	// 最後のfetchが実行されると、Collectionのresetイベントが発火してaddAll関数実行！	
 
+	OpenJankenDialog: function() {
+	    if(tasks.length != SetteiModel.get(0).get('ninzu')) {
+		// 2017-01-08 Add For 乱数
+		if(tasks.length == 0) {
+		    $('#tasks').html(tasksView.render().el);
+		} else {
+		    var model;
+		    while (model = tasks.first()) {
+			model.destroy();
+		    }
+		}
+		for(var i=0;i<SetteiModel.get(0).get('ninzu');i++) {
+		    var task = new Task();
+		    task.set({'id':i,
+			      'url' : '/',
+			      'alphabet':String.fromCharCode(97 + (i % 4)),
+			      'title':String.fromCharCode(65+i),
+			      'number': getRandomNum( SetteiModel.get(0).get('ninzu') , Math.floor( Math.random() * SetteiModel.get(0).get('ninzu') + 1))
+			     });
+		    tasks.add(task);
+		}
+	    }
+	},
+	
 	OpenMailDialog: function() {
 	    var mailview = new MailView();
 	    this.$("div#s4contes").html(mailview.render().el).trigger("create");
@@ -489,7 +599,6 @@ $(function(){
 		    model.destroy();
 		}
 	    }
-
 	    this.getAjaxData();
 
 	},
@@ -656,6 +765,9 @@ $(function(){
     // Finally, we kick things off by creating the **App**.
     // 最後にAppViewをインスタンス化
     //    var App = new AppView({"ninzu":6, "doubles":1, "men":1, "to":0, "limit":5});
-
+    var tasks = new Tasks();
+    var tasksView = new TasksView({collection:tasks});
+    // $('#tasks').html(tasksView.render().el);
+    
     var App  = new AppView();    
 });
