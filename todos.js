@@ -310,7 +310,7 @@ $(function(){
 	    this.$el.html(this.template(this.model.toJSON()));
 //	    this.stickit();
 	    return this;
-	},
+	}
 
     });
     
@@ -385,6 +385,7 @@ $(function(){
             this.$el.append(cview.render().el);
 	},
 	render: function(){
+	    App.syouhaiReCalc();
             this.collection.each(function(member){
 		this.addNew(member);
             },this);
@@ -533,37 +534,12 @@ $(function(){
 	initialize: function() {
 	},
 	
-	addWinGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('winnum') + 1;
-	    member.save({"winnum": num});
-	},
-
-	addLoseGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('losenum') + 1;
-	    member.save({"losenum": num});
-	},
-	addDrawGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('drawnum') + 1;
-	    member.save({"drawnum": num});
-	},
 
 	render: function() {
 	    var result_s = '';
 	    var result_p = '';
-	    var addWinGamePoint = this.addWinGamePoint;
-	    var addLoseGamePoint = this.addLoseGamePoint;
-	    var addDrawGamePoint = this.addDrawGamePoint;
-	    Members.each(function(member) {
-		member.set({'winnum' : 0});
-		member.set({'losenum' : 0});
-		member.set({'drawnum' : 0});
-	    });
+
+	    App.syouhaiReCalc();
 	    
 	    Games.each(function(game) {		
 		if( game.get('hantei') != 0 ) {
@@ -574,31 +550,19 @@ $(function(){
 		    if( game.get('hantei') == 1 ) {
 			r1 = "○";
 			r2 = "×";
-			addWinGamePoint(game.get('leftone'));
-			addWinGamePoint(game.get('lefttwo'));
-			addLoseGamePoint(game.get('rightone'));
-			addLoseGamePoint(game.get('righttwo'));
 		    } else if(game.get('hantei') == 2) {
 			r1 = "×";
 			r2 = "○";
-			addLoseGamePoint(game.get('leftone'));
-			addLoseGamePoint(game.get('lefttwo'));
-			addWinGamePoint(game.get('rightone'));
-			addWinGamePoint(game.get('righttwo'));
 		    } else if(game.get('hantei') == 3) {
 			r1 = "△";
 			r2 = "△";
-			addDrawGamePoint(game.get('leftone'));
-			addDrawGamePoint(game.get('lefttwo'));
-			addDrawGamePoint(game.get('rightone'));
-			addDrawGamePoint(game.get('righttwo'));
 		    }
 		    result_s += game.get('leftone') + (game.get('lefttwo') > 0 ? ',' + game.get('lefttwo') : '') + '(' + r1 + ')' + ' VS ' + game.get('rightone') + (game.get('righttwo') > 0 ? ',' + game.get('righttwo') : '') + '(' + r2 +')' + "\n";
 		}
 	    });
 
 	    Members.each(function(member) {
-		result_p +=member.get('member_name') + ' さん ' + member.get('winnum') + ' 勝 ' + member.get('losenum') + ' 負 ' + member.get('drawnum') + " 分\n"
+		result_p +=member.get('id') + ' : ' +  member.get('member_name') + ' さん ' + member.get('winnum') + ' 勝 ' + member.get('losenum') + ' 負 ' + member.get('drawnum') + " 分\n"
 	    });
 	    var now = new Date();
 	    this.$el.html(this.template({'year' : now.getFullYear(), 'mon':now.getMonth()+1 , 'day': now.getDate(), 'result_s': result_s, 'result_p' : result_p}));
@@ -867,6 +831,52 @@ $(function(){
 	},
 	saveAllModel: function()  {
 	    Members.each(this.saveOneModel,this);
+	},
+	addWinGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('winnum') + 1;
+	    member.save({"winnum": num});
+	},
+
+	addLoseGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('losenum') + 1;
+	    member.save({"losenum": num});
+	},
+	addDrawGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('drawnum') + 1;
+	    member.save({"drawnum": num});
+	},
+	syouhaiReCalc: function() {
+	    Members.each(function(member) {
+	    	member.set({'winnum' : 0});
+	    	member.set({'losenum' : 0});
+	    	member.set({'drawnum' : 0});
+	    });
+	    Games.each(function(game) {		
+		if( game.get('hantei') != 0 ) {
+		    if( game.get('hantei') == 1 ) {
+			App.addWinGamePoint(game.get('leftone'));
+			App.addWinGamePoint(game.get('lefttwo'));
+			App.addLoseGamePoint(game.get('rightone'));
+			App.addLoseGamePoint(game.get('righttwo'));
+		    } else if(game.get('hantei') == 2) {
+			App.addLoseGamePoint(game.get('leftone'));
+			App.addLoseGamePoint(game.get('lefttwo'));
+			App.addWinGamePoint(game.get('rightone'));
+			App.addWinGamePoint(game.get('righttwo'));
+		    } else if(game.get('hantei') == 3) {
+			App.addDrawGamePoint(game.get('leftone'));
+			App.addDrawGamePoint(game.get('lefttwo'));
+			App.addDrawGamePoint(game.get('rightone'));
+			App.addDrawGamePoint(game.get('righttwo'));
+		    }
+		}
+	    });
 	}
     });
 
