@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>テニス乱数表君V2</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<style type="text/css">
+.containing-element .ui-slider-switch { width: 9em }
+.ph-tap{background:     #ffffff;}
+.ph-tapped{ background: #6495ed; }
+</style>
+<link rel="stylesheet" href="jquery.mobile-1.4.5.min.css" />
+<script src="jquery-1.12.4.min.js"></script>
+<script src="jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="custom.css"/>
+<script src="json2.min.js"></script>
+<script src="underscore-min.js"></script>
+<script src="backbone-min.js"></script>
+<script src="backbone.localStorage-min.js"></script>
+<script src="backbone.stickit.js"></script>
+<script src="test.js"></script>
+</head>
+
+<body>
+
+  <div data-dialog="true" data-role="page" id="koutai-dialog">
+    <div data-role="header">
+      <h2>交代</h2>
+    </div>  
+    <form>
+      <fieldset data-role="controlgroup">
+	<legend>交代メンバーをダブルクリックで選択:</legend>
+	<div id="kmembers">
+	</div>
+      </fieldset>
+      <p><a data-role="button" data-rel="back">キャンセル</a></p>
+    </form>
+  </div>
+
+  <script type="text/template" id="kmembers-template">
+    <input type="radio" name="kmembers_n" class="kmembers_n" id="kmembers_n<%=id%>" value="<%=id%>" checked="checked">
+    <label for="kmembers_n<%=id%>"><%=id%>&nbsp;:&nbsp;<%= member_name %>(<%= shiainum %>試合<%= winnum %>勝<%= losenum %>負<%= drawnum %>分)</label>
+  </script>
+</body>
+</html>
