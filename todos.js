@@ -314,6 +314,83 @@ $(function(){
 
     });
     
+    var ChangeMemberView = Backbone.View.extend({
+	gmodel: null,
+	moto: "",
+	
+	template: _.template($('#kmembers-template').html()),
+
+	initialize: function() {
+	    this.listenTo(this.model, 'change', this.render);
+	},
+	events: {
+	    "dblclick" : "chageMember",
+	},
+	setGmodel: function(_gmodel) {
+	    this.gmodel = _gmodel;
+	},
+	getGmodel: function() {
+	    return this.gmodel;
+	},
+	setMoto: function(_moto) {
+	    this.moto = _moto;
+	},
+	getMoto: function() {
+	    return this.moto;
+	},
+	chageMember: function() {
+	    var kmem=$('input[name=kmembers_n]:checked').val();
+	    var gmodel_c = _.clone();
+	    this.getGmodel().set(this.getMoto(), kmem);
+	    $.mobile.changePage("#s2"); 
+	},
+	// Re-render the titles of the todo item.
+	// Modelの内容をHTMLに落としこむ関数
+	render: function() {
+	    var iShiainum = this.model.get('winnum') + this.model.get('losenum') + this.model.get('drawnum');
+	    this.model.set({shiainum: iShiainum});
+	    this.$el.html(this.template(this.model.toJSON()));
+	    this.stickit();
+	    
+	    return this;
+	},
+    });
+
+    var ChangeMembersView = Backbone.View.extend({
+	gmodel: null,
+	moto: "",
+
+	initialize: function(){
+	    　　　　//this.collectionはインスタンス生成時のCollectionです。
+            this.collection.on('add', this.addNew, this);
+
+	},
+		setGmodel: function(_gmodel) {
+	    this.gmodel = _gmodel;
+	},
+	getGmodel: function() {
+	    return this.gmodel;
+	},
+	setMoto: function(_moto) {
+	    this.moto = _moto;
+	},
+	getMoto: function() {
+	    return this.moto;
+	},
+
+	addNew: function(member){
+            var cview = new ChangeMemberView({model: member});
+	    cview.setGmodel(this.getGmodel());
+	    cview.setMoto(this.getMoto());
+            this.$el.append(cview.render().el);
+	},
+	render: function(){
+            this.collection.each(function(member){
+		this.addNew(member);
+            },this);
+            return this;
+	}
+    });
     
     // Create our global collection of **Games**.
     var Games = new GameList();
@@ -330,7 +407,11 @@ $(function(){
 
 	events: {
 	    "click .ph-tap"   : "colorChange",
-	    "click .dialogopenbtn" : "dialogOpen"
+	    "dblclick .ph-tapped"   : "dialogOpen",
+	    "click .dialogopenbtn1" : "dialogOpenKoutai1",
+	    "click .dialogopenbtn2" : "dialogOpenKoutai2",
+	    "click .dialogopenbtn3" : "dialogOpenKoutai3",
+	    "click .dialogopenbtn4" : "dialogOpenKoutai4",
 	},
 
 	// The TodoView listens for changes to its model, re-rendering. Since there's
@@ -378,6 +459,33 @@ $(function(){
 	    var dview = new DialogView;
 	    dview.setModel(this.model);
 	    $('#shouhai-contents').html(dview.render().el).trigger("create");
+	    $.mobile.changePage("#shouhai-dialog");
+	},
+	dialogOpenKoutai1 : function() {
+	    this.dialogOpenKoutai('leftone');
+	},
+	dialogOpenKoutai2 : function() {
+	    this.dialogOpenKoutai('lefttwo');
+	},
+	dialogOpenKoutai3 : function() {
+	    this.dialogOpenKoutai('rightone');
+	},
+	dialogOpenKoutai4 : function() {
+	    this.dialogOpenKoutai('righttwo');
+	},	
+	dialogOpenKoutai: function(_moto) {
+	    // 押され元を指定する（見実装）
+	    dview = new ChangeMembersView({collection:Members});
+	    dview.setGmodel(this.model);
+	    dview.setMoto(_moto);
+	    $('#kmembers').html(dview.render().el).trigger("create");
+	    // $('#shouhai-dialog').dialog({
+	    //        autoOpen: false,
+            // modal: true,
+            // width: 550,
+	    //        height:650,
+            // title: 'Details'
+	// }).dialog("open");
 	},
 
 
