@@ -29,7 +29,6 @@
   <ul data-role="listview">
     <li data-role="list-divider">サービス</li>
     <li><a id="sb1" href="#s1" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">設定に戻る</a></li>
-    <li><a id="sb4" href="#s5" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">じゃんけん</a></li>
     <li><a href="#s3" id="sb2" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メンバー割</a></li>
     <li><a href="#s4" id="sb3" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メール</a></li>
   </ul>
@@ -49,7 +48,7 @@
   </div>
 </div>
 <div data-role="footer">
-  <h2><a href="mailto:osamasa@gmail.com?subject=お問い合わせ">Osamasa(C)&nbsp;2016</a></h2>
+  <h2><a href="mailto:osamasa@gmail.com?subject=お問い合わせ">Osamasa(C)&nbsp;2017</a></h2>
   <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
 </div>
 </div>
@@ -78,14 +77,7 @@
       <ul data-role="listview" id="memberlist" data-inset="true">
       </ul>
     </div>
-<div class="ui-grid-a">
-<div class="ui-block-a">
-  <p><a data-role="button" href="#s2" id="b4">決定</a></p>
-</div>
-<div class="ui-block-b">
-  <p><a data-role="button" data-rel="back">キャンセル</a></p>
-</div>
-</div>    
+    <p><a data-role="button" href="#s3" id="b5">シャッフル</a></p>
   </div>
 </div>
 
@@ -96,17 +88,6 @@
 <div id="s4contes" data-role="content">
 </div>
 <p><a data-role="button" data-rel="back">閉じる</a></p>
-</div>
-
-<div data-dialog="true" data-role="page" id="s5">
-  <div data-role="header">
-    <h2>乱数割付君</h2>
-  </div>
-  <!-- Task一覧部分 -->
-  <div id="tasks" data-role="content">
-  </div>
-
-  <p><a data-role="button" data-rel="back">閉じる</a></p>
 </div>
 
   <div data-dialog="true" data-role="page" id="koutai-dialog">
@@ -127,12 +108,6 @@
     <input type="radio" name="kmembers_n" class="kmembers_n" id="kmembers_n<%=id%>" value="<%=id%>" checked="checked">
     <label for="kmembers_n<%=id%>"><%=id%>&nbsp;:&nbsp;<%= member_name %>(<%= shiainum %>試合<%= winnum %>勝<%= losenum %>負<%= drawnum %>分)</label>
   </script>
-  
-<script type="text/template" id="task-template">
-  <div class="ui-bar ui-bar-a" style="height:60px text-align:center; ">
-    <input type="button" value="<%= title %>" n-data="<%= number %>">
-  </div>
-</script>
 
 <script type="text/template" id="mailbun-template">
   <div data-role="content">
@@ -155,7 +130,7 @@ http://osamasa.github.io/
 
 
 <script type="text/template" id="mitem-template">
-  <li class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3><%= id %></h3></div><div class="ui-block-b" style="width:90%;"><input name="member_name" type="text" value="<%= member_name %>" id="member_<%= id %>" /></div></div></li>
+  <li class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3><%= id %></h3></div><div class="ui-block-b" style="width:90%;"><input name="member_name" type="text" class="member_name_txt" value="<%= member_name %>" id="member_<%= id %>" /></div></div></li>
 </script>
 
 <script type="text/template" id="item-template">

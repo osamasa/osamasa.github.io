@@ -30,76 +30,6 @@ $(function(){
 	}
 	return jsonArray;
     }
-
-    ///Model
-    var Task = Backbone.Model.extend({
-	initialize: function(){
-	}});
-
-    ///Collection
-    var Tasks = Backbone.Collection.extend({ model: Task })
-
-    ///View
-    //Task一覧部分
-    var TaskView = Backbone.View.extend({
-	　　//Viewのルート要素を指定します。
-	//削除イベント
-	tagName : "div",
-	initialize: function(){　　
-			       //「Task一覧部分」でタスクが削除されたときremoveメソッドを起動しています。
-			       //modelも削除する
-			       this.model.on('destroy', this.remove, this);
-			      },
-	events: {
-	    　　　　　//ルート内のクラス名deleteがclickされたときdestroyメソッドを起動します。
-            'click input':'shownumber'
-	},
-	shownumber: function(){
-            alert(this.model.get('number'));
-	    this.$el.find('input').remove();
-	    this.$el.html('<p style="text-align:center; font-weight:bold;">' + this.model.get('number') + '</p>');
-	    
-	},
-	remove: function(){
-	    　　　　//$elはViewのルート要素です。
-            this.$el.remove();
-	},
-	/*
-	  _.templateはunderscore.js の機能で、画面テンプレートを生成するfunctionを返します。
-	*/
-	template: _.template($('#task-template').html()),
-	render: function(){
-            //modelをtemplateに渡す
-	    var template = this.template(this.model.toJSON());
-            this.$el.html(template);
-	    this.$el.attr('id', 'btn' + this.model.get('id'));
-	    this.$el.attr('class', 'ui-block-' + this.model.get('alphabet'));
-            return this;
-	}
-    });
-
-    var TasksView = Backbone.View.extend({
-	　　//登録フォームでタスクが追加されたらaddNewメソッドを起動しています。
-	tagName: 'fieldset',
-	className: 'ui-grid-c',
-	initialize: function(){
-	    　　　　//this.collectionはインスタンス生成時のCollectionです。
-            this.collection.on('add', this.addNew, this);
-
-	},
-	addNew: function(task){
-            var taskView = new TaskView({model: task});
-            this.$el.append(taskView.render().el);
-	},
-	render: function(){
-            this.collection.each(function(task){
-		var taskView = new TaskView({model: task});
-		var a = taskView.render().el;
-		this.$el.append(taskView.render().el);
-            },this);
-            return this;
-	}
-    });
     
     var mrireki = Backbone.Model.extend({
 	defaults: function() {
@@ -289,9 +219,9 @@ $(function(){
 
 	template: _.template($('#mitem-template').html()),
 
-//	bindings: {
-//	    '.member_name' : 'member_name'
-//	},
+	bindings: {
+	    '.member_name' : 'member_name'
+	},
 
 	// The TodoView listens for changes to its model, re-rendering. Since there's
 	// a one-to-one correspondence between a **Todo** and a **TodoView** in this
@@ -299,18 +229,26 @@ $(function(){
 	// Modelの更新を検知してViewを更新するために、ModelをlistenToしておく
 	// よって、ModelのTodoとViewのTodoViewは1:1で紐づくことになる
 	initialize: function() {
-//	    this.listenTo(this.model, 'change', this.render);
-//	    this.listenTo(this.model, 'destroy', this.remove);
+	    this.listenTo(this.model, 'change', this.render);
+	    this.listenTo(this.model, 'destroy', this.remove);
+	},
+	events: {
+	    "change input" : "changeMemberInput"
 	},
 
-
+	changeMemberInput: function() {
+	    var tmp = '#member_' + this.model.get("id");
+	    var tmp2 = this.$el.find(tmp).val();
+	    this.model.set({"member_name" : tmp2});
+	    this.model.save();
+	},
 	// Re-render the titles of the todo item.
 	// Modelの内容をHTMLに落としこむ関数
 	render: function() {
-	    this.$el.html(this.template(this.model.toJSON()));
-//	    this.stickit();
+	    this.$el.html(this.template(this.model.toJSON())).trigger("create");
+	    this.stickit();
 	    return this;
-	},
+	}
 
     });
     
@@ -385,6 +323,7 @@ $(function(){
             this.$el.append(cview.render().el);
 	},
 	render: function(){
+	    App.syouhaiReCalc();
             this.collection.each(function(member){
 		this.addNew(member);
             },this);
@@ -533,37 +472,12 @@ $(function(){
 	initialize: function() {
 	},
 	
-	addWinGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('winnum') + 1;
-	    member.save({"winnum": num});
-	},
-
-	addLoseGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('losenum') + 1;
-	    member.save({"losenum": num});
-	},
-	addDrawGamePoint: function(idno) {
-	    if(idno == 0) return;
-	    var member = Members.get(Number(idno));
-	    var num = member.get('drawnum') + 1;
-	    member.save({"drawnum": num});
-	},
 
 	render: function() {
 	    var result_s = '';
 	    var result_p = '';
-	    var addWinGamePoint = this.addWinGamePoint;
-	    var addLoseGamePoint = this.addLoseGamePoint;
-	    var addDrawGamePoint = this.addDrawGamePoint;
-	    Members.each(function(member) {
-		member.set({'winnum' : 0});
-		member.set({'losenum' : 0});
-		member.set({'drawnum' : 0});
-	    });
+
+	    App.syouhaiReCalc();
 	    
 	    Games.each(function(game) {		
 		if( game.get('hantei') != 0 ) {
@@ -574,31 +488,19 @@ $(function(){
 		    if( game.get('hantei') == 1 ) {
 			r1 = "○";
 			r2 = "×";
-			addWinGamePoint(game.get('leftone'));
-			addWinGamePoint(game.get('lefttwo'));
-			addLoseGamePoint(game.get('rightone'));
-			addLoseGamePoint(game.get('righttwo'));
 		    } else if(game.get('hantei') == 2) {
 			r1 = "×";
 			r2 = "○";
-			addLoseGamePoint(game.get('leftone'));
-			addLoseGamePoint(game.get('lefttwo'));
-			addWinGamePoint(game.get('rightone'));
-			addWinGamePoint(game.get('righttwo'));
 		    } else if(game.get('hantei') == 3) {
 			r1 = "△";
 			r2 = "△";
-			addDrawGamePoint(game.get('leftone'));
-			addDrawGamePoint(game.get('lefttwo'));
-			addDrawGamePoint(game.get('rightone'));
-			addDrawGamePoint(game.get('righttwo'));
 		    }
 		    result_s += game.get('leftone') + (game.get('lefttwo') > 0 ? ',' + game.get('lefttwo') : '') + '(' + r1 + ')' + ' VS ' + game.get('rightone') + (game.get('righttwo') > 0 ? ',' + game.get('righttwo') : '') + '(' + r2 +')' + "\n";
 		}
 	    });
 
 	    Members.each(function(member) {
-		result_p +=member.get('member_name') + ' さん ' + member.get('winnum') + ' 勝 ' + member.get('losenum') + ' 負 ' + member.get('drawnum') + " 分\n"
+		result_p +=member.get('id') + ' : ' +  member.get('member_name') + ' さん ' + member.get('winnum') + ' 勝 ' + member.get('losenum') + ' 負 ' + member.get('drawnum') + " 分\n"
 	    });
 	    var now = new Date();
 	    this.$el.html(this.template({'year' : now.getFullYear(), 'mon':now.getMonth()+1 , 'day': now.getDate(), 'result_s': result_s, 'result_p' : result_p}));
@@ -629,6 +531,7 @@ $(function(){
 	    "click #sb3":  "OpenMailDialog",
 	    "click #sb4":  "OpenJankenDialog",
 	    "click #b4":  "saveAllModel",
+	    "click #b5": "pushShufuttleButton",
 	    "click #clear-completed": "clearCompleted",
 	    "click #toggle-all": "toggleAllComplete"
 	},
@@ -638,7 +541,23 @@ $(function(){
 	// loading any preexisting todos that might be saved in *localStorage*.
 	// CollectionのイベントをlistenToすることで、Viewをrenderする算段
 	// 最後のfetchが実行されると、Collectionのresetイベントが発火してaddAll関数実行！	
+	pushShufuttleButton: function() {
+	    var ninzu = SetteiModel.get(0).get('ninzu');
+	    var i=0;
+	    Members.each(function(member) {
+		member.set("id",(100+(++i)));
+	    });
+	    gRANSUARRAY = [];
+	    Members.each(function(member) {
+		member.set("id",getRandomNum( ninzu, Math.floor( Math.random() * ninzu + 1)));
+		member.save();
+	    });
 
+	    Members.sort();
+	    this.$("#memberlist").html("");
+	    this.MemberAddAll();
+	},
+	
 	OpenJankenDialog: function() {
 	    if(tasks.length != SetteiModel.get(0).get('ninzu')) {
 		// 2017-01-08 Add For 乱数
@@ -776,7 +695,7 @@ $(function(){
 
 	MemberAddOne: function(todo) {
 	    var view = new MembersView({model: todo});	    
-	    this.$("#memberlist").append(view.render().el);
+	    this.$("#memberlist").append(view.render().el).trigger("create");
 	},
 
 	// Add all items in the **Todos** collection at once.
@@ -867,15 +786,57 @@ $(function(){
 	},
 	saveAllModel: function()  {
 	    Members.each(this.saveOneModel,this);
+	},
+	addWinGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('winnum') + 1;
+	    member.save({"winnum": num});
+	},
+
+	addLoseGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('losenum') + 1;
+	    member.save({"losenum": num});
+	},
+	addDrawGamePoint: function(idno) {
+	    if(idno == 0) return;
+	    var member = Members.get(Number(idno));
+	    var num = member.get('drawnum') + 1;
+	    member.save({"drawnum": num});
+	},
+	syouhaiReCalc: function() {
+	    Members.each(function(member) {
+	    	member.set({'winnum' : 0});
+	    	member.set({'losenum' : 0});
+	    	member.set({'drawnum' : 0});
+	    });
+	    Games.each(function(game) {		
+		if( game.get('hantei') != 0 ) {
+		    if( game.get('hantei') == 1 ) {
+			App.addWinGamePoint(game.get('leftone'));
+			App.addWinGamePoint(game.get('lefttwo'));
+			App.addLoseGamePoint(game.get('rightone'));
+			App.addLoseGamePoint(game.get('righttwo'));
+		    } else if(game.get('hantei') == 2) {
+			App.addLoseGamePoint(game.get('leftone'));
+			App.addLoseGamePoint(game.get('lefttwo'));
+			App.addWinGamePoint(game.get('rightone'));
+			App.addWinGamePoint(game.get('righttwo'));
+		    } else if(game.get('hantei') == 3) {
+			App.addDrawGamePoint(game.get('leftone'));
+			App.addDrawGamePoint(game.get('lefttwo'));
+			App.addDrawGamePoint(game.get('rightone'));
+			App.addDrawGamePoint(game.get('righttwo'));
+		    }
+		}
+	    });
 	}
     });
 
     // Finally, we kick things off by creating the **App**.
     // 最後にAppViewをインスタンス化
     //    var App = new AppView({"ninzu":6, "doubles":1, "men":1, "to":0, "limit":5});
-    var tasks = new Tasks();
-    var tasksView = new TasksView({collection:tasks});
-    // $('#tasks').html(tasksView.render().el);
-    
     var App  = new AppView();    
 });
