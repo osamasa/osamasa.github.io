@@ -252,9 +252,10 @@ $(function(){
 
     });
     
-    var ChangeMemberView = Backbone.View.extend({
+    var ChangeMemberView = Backbone.View.extend({	
 	gmodel: null,
 	moto: "",
+	tagName : "li",
 	
 	template: _.template($('#kmembers-template').html()),
 
@@ -262,7 +263,7 @@ $(function(){
 	    this.listenTo(this.model, 'change', this.render);
 	},
 	events: {
-	    "dblclick" : "chageMember",
+	    "click .changemem" : "chageMember",
 	},
 	setGmodel: function(_gmodel) {
 	    this.gmodel = _gmodel;
@@ -277,10 +278,8 @@ $(function(){
 	    return this.moto;
 	},
 	chageMember: function() {
-	    var kmem=$('input[name=kmembers_n]:checked').val();
-	    var gmodel_c = _.clone();
-	    this.getGmodel().set(this.getMoto(), kmem);
-	    $.mobile.changePage("#s2"); 
+	    var kmem=this.model.get("id");
+	    this.getGmodel().save(this.getMoto(), kmem);
 	},
 	// Re-render the titles of the todo item.
 	// Modelの内容をHTMLに落としこむ関数
@@ -288,8 +287,6 @@ $(function(){
 	    var iShiainum = this.model.get('winnum') + this.model.get('losenum') + this.model.get('drawnum');
 	    this.model.set({shiainum: iShiainum});
 	    this.$el.html(this.template(this.model.toJSON()));
-	    this.stickit();
-	    
 	    return this;
 	},
     });
@@ -297,11 +294,12 @@ $(function(){
     var ChangeMembersView = Backbone.View.extend({
 	gmodel: null,
 	moto: "",
+	el: '#kmembers',
 
 	initialize: function(){
 	    　　　　//this.collectionはインスタンス生成時のCollectionです。
             this.collection.on('add', this.addNew, this);
-
+	    this.$el.html("");
 	},
 		setGmodel: function(_gmodel) {
 	    this.gmodel = _gmodel;
@@ -322,11 +320,12 @@ $(function(){
 	    cview.setMoto(this.getMoto());
             this.$el.append(cview.render().el);
 	},
-	render: function(){
+	render: function(){	    	    
 	    App.syouhaiReCalc();
             this.collection.each(function(member){
 		this.addNew(member);
             },this);
+	    this.$el.listview('refresh');
             return this;
 	}
     });
@@ -417,7 +416,8 @@ $(function(){
 	    dview = new ChangeMembersView({collection:Members});
 	    dview.setGmodel(this.model);
 	    dview.setMoto(_moto);
-	    $('#kmembers').html(dview.render().el).trigger("create");
+	    dview.render();
+	    
 	    // $('#shouhai-dialog').dialog({
 	    //        autoOpen: false,
             // modal: true,
