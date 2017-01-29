@@ -94,19 +94,14 @@
     <div data-role="header">
       <h2>交代</h2>
     </div>  
-    <form>
-      <fieldset data-role="controlgroup">
-	<legend>交代メンバーをダブルクリックで選択:</legend>
-	<div id="kmembers">
-	</div>
-      </fieldset>
-      <p><a data-role="button" data-rel="back">キャンセル</a></p>
-    </form>
+    <legend>交代メンバーをダブルクリックで選択:</legend>
+      <ul data-role="listview" id="kmembers">
+      </ul>
+    <p><a data-role="button" data-rel="back">キャンセル</a></p>
   </div>
 
   <script type="text/template" id="kmembers-template">
-    <input type="radio" name="kmembers_n" class="kmembers_n" id="kmembers_n<%=id%>" value="<%=id%>" checked="checked">
-    <label for="kmembers_n<%=id%>"><%=id%>&nbsp;:&nbsp;<%= member_name %>(<%= shiainum %>試合<%= winnum %>勝<%= losenum %>負<%= drawnum %>分)</label>
+    <a href="#s2" id="kmembers_n<%=id%>" class="changemem" data="<%=id%>" ><%=id%>&nbsp;:&nbsp;<%= member_name %>(<%= shiainum %>試合<%= winnum %>勝<%= losenum %>負<%= drawnum %>分</a>
   </script>
 
 <script type="text/template" id="mailbun-template">
