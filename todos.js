@@ -346,10 +346,10 @@ $(function(){
 	events: {
 	    "click .ph-tap"   : "colorChange",
 	    "dblclick .ph-tapped"   : "dialogOpen",
-	    "click .dialogopenbtn1" : "dialogOpenKoutai1",
-	    "click .dialogopenbtn2" : "dialogOpenKoutai2",
-	    "click .dialogopenbtn3" : "dialogOpenKoutai3",
-	    "click .dialogopenbtn4" : "dialogOpenKoutai4",
+	    "click .dialogopenbtn1" : "dialogOpen",
+	    "click .dialogopenbtn2" : "dialogOpen",
+	    "click .dialogopenbtn3" : "dialogOpen",
+	    "click .dialogopenbtn4" : "dialogOpen",
 	},
 
 	// The TodoView listens for changes to its model, re-rendering. Since there's
@@ -532,6 +532,7 @@ $(function(){
 	    "click #sb4":  "OpenJankenDialog",
 	    "click #b4":  "saveAllModel",
 	    "click #b5": "pushShufuttleButton",
+	    "click #b6": "pushCompleteButton",
 	    "click #clear-completed": "clearCompleted",
 	    "click #toggle-all": "toggleAllComplete"
 	},
@@ -557,7 +558,12 @@ $(function(){
 	    this.$("#memberlist").html("");
 	    this.MemberAddAll();
 	},
-	
+
+	pushCompleteButton: function() {
+	    this.$("#memberlist").html("");
+	    this.MemberAddAll();
+	},
+
 	OpenJankenDialog: function() {
 	    if(tasks.length != SetteiModel.get(0).get('ninzu')) {
 		// 2017-01-08 Add For 乱数
