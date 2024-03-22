@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>テニス乱数表君V2</title>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<style type="text/css">
+.containing-element .ui-slider-switch { width: 9em }
+.ph-tap{background:     #ffffff;}
+.ph-tapped{ background: #6495ed; }
+</style>
+<link rel="stylesheet" href="jquery.mobile-1.4.5.min.css" />
+<script src="jquery-1.12.4.min.js"></script>
+<script src="jquery.mobile-1.4.5.min.js"></script>
+<link rel="stylesheet" href="custom.css"/>
+<script src="json2.min.js"></script>
+<script src="underscore-min.js"></script>
+<script src="backbone-min.js"></script>
+<script src="backbone.localStorage-min.js"></script>
+<script src="backbone.stickit.js"></script>
+<script src="todos.js"></script>
+</head>
+
+<body>
+
+<div data-role="page" id="s2">
+
+<div data-role="panel" id="menu" data-theme="b">
+  <ul data-role="listview">
+    <li data-role="list-divider">サービス</li>
+    <li><a id="sb1" href="#s1" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">設定に戻る</a></li>
+    <li><a href="#s3" id="sb2" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メンバー割</a></li>
+    <li><a href="#s4" id="sb3" class="ui-shadow ui-btn ui-corner-all ui-btn-inline" data-transition="pop">メール</a></li>
+  </ul>
+</div>
+  
+<div data-role="header" data-theme="a" id="header">
+  <h1>テニス乱数表君V2</h1>
+  <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu">Menu</a>
+</div>
+<div data-role="content">
+  <div  class="content-primary main-content">
+    <ul data-role="listview" id="todo-list">
+    </ul>
+    <p>
+    <input type="button" class="nextgame" id="b2" value="もっと見る" />
+    </p>
+  </div>
+</div>
+<div data-role="footer">
+  <h2><a href="mailto:osamasa@gmail.com?subject=お問い合わせ">Osamasa(C)&nbsp;2017</a></h2>
+  <a href="#menu" data-icon="grid" data-iconpos="notext" data-direction="reverse" class="ui-btn-left menu" onclick="setMenu();">Menu</a>
+</div>
+</div>
+
+<div data-dialog="true" data-role="page" id="shouhai-dialog">
+<div data-role="header">
+  <h2>勝敗設定</h2>
+</div>
+<div data-role="content" id="shouhai-contents">
+</div>
+</div>
+
+<div data-dialog="true" data-role="page" id="s1">
+<div data-role="header">
+  <h2>ゲーム設定</h2>
+</div>
+<div id="s1contents" data-role="content"></div>  
+</div>
+
+<div data-dialog="true" data-role="page" id="s3">
+<div data-role="header">
+  <h2>メンバー割付</h2>
+</div>     
+<div id="s3contes" data-role="content">
+    <div data-role="fieldcontain">
+      <ul data-role="listview" id="memberlist" data-inset="true">
+      </ul>
+    </div>
+    <p><a data-role="button" href="#s2" id="b6">完了</a></p>
+    <p><a data-role="button" href="#s3" id="b5">シャッフル</a></p>
+  </div>
+</div>
+
+<div data-dialog="true" data-role="page" id="s4">
+<div data-role="header">
+  <h2>コピーしてお使いください</h2>
+</div>   
+<div id="s4contes" data-role="content">
+</div>
+<p><a data-role="button" data-rel="back">閉じる</a></p>
+</div>
+
+  <div data-dialog="true" data-role="page" id="koutai-dialog">
+    <div data-role="header">
+      <h2>交代</h2>
+    </div>  
+    <legend>交代メンバーをダブルクリックで選択:</legend>
+      <ul data-role="listview" id="kmembers">
+      </ul>
+    <p><a data-role="button" data-rel="back">キャンセル</a></p>
+  </div>
+
+  <script type="text/template" id="kmembers-template">
+    <a href="#s2" id="kmembers_n<%=id%>" class="changemem" data="<%=id%>" ><%=id%>&nbsp;:&nbsp;<%= member_name %>(<%= shiainum %>試合<%= winnum %>勝<%= losenum %>負<%= drawnum %>分</a>
+  </script>
+
+<script type="text/template" id="mailbun-template">
+  <div data-role="content">
+    <div data-role="fieldcontain">
+      <pre name="textarea1" id="textarea1">
+本日はお疲れ様でした
+本日(<%= year %>年<%= mon %>月<%= day %>日)の試合結果をお送りします
+
+<%= result_s %>
+
+<%= result_p %>
+
+--
+テニス乱数表君V2
+http://osamasa.github.io/
+      </pre>
+    </div>
+  </div>
+</script>
+
+
+<script type="text/template" id="mitem-template">
+  <li class="clmem"><div class="ui-grid-a"><div class="ui-block-a" style="width:10%;"><h3><%= id %></h3></div><div class="ui-block-b" style="width:90%;"><input name="member_name" type="text" class="member_name_txt" value="<%= member_name %>" id="member_<%= id %>" /></div></div></li>
+</script>
+
+<script type="text/template" id="item-template">
+
+<div  data-role="list-divider"  class="ui-li-divider ui-bar-inherit ui-first-child">第<%= shiai_num %>試合</div>
+<div class="score ph-tap ui-grid-d" data-gid="<%= id %>">
+  <!-- <div class="ui-block-a"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= leftone %></a>-->
+  <div class="ui-block-a"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn1"><%= leftone %></a>
+  
+<% if(hantei>0) { %>
+<div align="right">
+  <%= score_l %>
+</div>
+<% } %>	
+</div>
+  <!-- <div class="ui-block-b" ><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= lefttwo %></a></div> -->
+  <div class="ui-block-b" ><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn2"><%= lefttwo %></a></div>
+  
+<% if(hantei) { %>
+<div>
+  <% if(hantei == 1) { %>○<% }%>
+  <% if(hantei == 2) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>	
+</div>	
+<div class="ui-block-c"></div>
+<div class="ui-block-d"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn3"><%= rightone %></a></div>
+<% if(hantei) { %>
+<div align="right">
+  <% if(hantei == 2) { %>○<% }%>
+  <% if(hantei == 1) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>
+</div>
+<div class="ui-block-e"><div class="button-wrap"><a href="#shouhai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn4"><%= righttwo %></a></div>
+<% if(hantei>0) { %>
+<div>
+  <%= score_r %>
+</div>
+<% } %>
+</div>
+</div>
+</div>
+</script>
+
+<script type="text/template" id="item-template-s">
+
+<div  data-role="list-divider"  class="ui-li-divider ui-bar-inherit ui-first-child">第<%= shiai_num %>試合</div>
+<div class="score ph-tap ui-grid-b" data-gid="<%= id %>">
+
+<div class="ui-block-a"><a href="#koutai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= leftone %></a>
+<% if(hantei>0) { %>
+<div align="right">
+  <%= score_l %>
+  <% if(hantei == 1) { %>○<% }%>
+  <% if(hantei == 2) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+</div>
+<% } %>	
+</div>
+<div class="ui-block-b"></div>
+<div class="ui-block-c"><div class="button-wrap"><a href="#koutai-dialog" data-role="button" class="ui-shadow ui-btn ui-corner-all dialogopenbtn"><%= rightone %></a></div>
+<% if(hantei) { %>
+<div align="left">
+  <% if(hantei == 2) { %>○<% }%>
+  <% if(hantei == 1) { %>×<% }%>	
+  <% if(hantei == 3) { %>△<% }%>
+  <%= score_r %>
+</div>
+<% } %>
+</div>
+</div>
+</div>
+</script>
+
+
+<script type="text/template" id="stats-template">
+<% if (done) { %>
+<a id="clear-completed">Clear <%= done %> completed <%= done == 1 ? 'item' : 'items' %></a>
+<% } %>
+<div class="todo-count"><b><%= remaining %></b> <%= remaining == 1 ? 'item' : 'items' %> left</div>
+</script>
+
+<script type="text/template" id="sdialog-template">
+<div class="containing-element">
+  <label for="flip-min">ゲーム形式:</label>
+  <select name="slider" id="flip-min" data-role="slider">
+    <option value="1">ダブルス</option>
+    <option value="0">シングルス</option>
+  </select>
+</div>
+
+<div data-role="fieldcontain">
+  <label for="select-choice-1">人数</label>
+  <select name="select-choice-1" id="select-choice-1">
+    <option value="4">4人</option>
+    <option value="5">5人</option>
+    <option value="6">6人</option>
+    <option value="7">7人</option>
+    <option value="8">8人</option>
+    <option value="9">9人</option>
+    <option value="10">10人</option>
+    <option value="11">11人</option>
+    <option value="12">12人</option>
+    <option value="13">13人</option>
+    <option value="14">14人</option>
+    <option value="15">15人</option>
+    <option value="16">16人</option>
+    <option value="17">17人</option>
+    <option value="18">18人</option>
+    <option value="19">19人</option>
+    <option value="20">20人</option>
+    <option value="21">21人</option>
+    <option value="22">22人</option>
+    <option value="23">23人</option>
+    <option value="24">24人</option>
+    <option value="25">25人</option>
+    <option value="26">26人</option>
+    <option value="27">27人</option>
+    <option value="28">28人</option>
+    <option value="29">29人</option>
+    <option value="30">30人</option>
+  </select>
+</div>
+<div data-role="fieldcontain">
+  <label for="select-choice-2">面数</label>
+  <select name="select-choice-2" id="select-choice-2">
+    <option value="1">1面</option>
+    <option value="2">2面</option>
+    <option value="3">3面</option>
+    <option value="4">4面</option>
+    <option value="5">5面</option>
+    <option value="6">6面</option>
+    <option value="7">7面</option>
+    <option value="8">8面</option>
+    <option value="9">9面</option>
+    <option value="10">10面</option>
+  </select>
+</div>
+  
+</div>
+<div class="ui-grid-a">
+<div class="ui-block-a">
+  <p><a data-role="button" href="#s2" id="b1">決定</a></p>
+</div>
+<div class="ui-block-b">
+  <p><a data-role="button" data-rel="back">キャンセル</a></p>
+</div>
+</script>
+
+<script type="text/template" id="dialog-template">
+
+  <fieldset data-role="controlgroup">
+  <legend>勝敗結果を選択:</legend>
+  <input type="radio" name="hantei" id="r1" value="0" checked="checked" />
+  <label for="r1">-</label>
+  <input type="radio" name="hantei" id="r2" value="1" />
+  <label for="r2"><div class="left_t_win"><%= leftone %><% if (lefttwo) {%><%= lefttwo %><% } %>の勝ち</div></label>
+  <input type="radio" name="hantei" id="r3" value="2" />
+  <label for="r3"><div class="right_t_win"><%= rightone %><% if(righttwo) {%><%= righttwo %><% } %>の勝ち</div></label>
+  <input type="radio" name="hantei" id="r4" value="3" />
+  <label for="r4">引き分け</label>
+  </fieldset>
+  <div class="ui-grid-a">
+  <div class="ui-block-a">
+    <label for="select-choice-10" class="select"><div class="left_t_tensu"><%= leftone %> <% if (lefttwo) { %><%= lefttwo %><% } %>の点数</div></label>
+    
+    <select name="select-choice-10" id="select-choice-10">
+      <option value="-1">-</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+    </select>
+  </div>
+  <div class="ui-block-b">
+    <label for="select-choice-11" class="select"><div class="right_t_tensu"><%= rightone %> <% if(righttwo) { %><%= righttwo %><% } %>の点数</div></label>
+    <select name="select-choice-11" id="select-choice-11">
+      <option value="-1">-</option>
+      <option value="0">0</option>
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+      <option value="5">5</option>
+      <option value="6">6</option>
+      <option value="7">7</option>
+      <option value="8">8</option>
+    </select>
+  </div>
+  <div class="ui-block-a">
+    <p><a id="dialogsettei" href="#s2" data-role="button">決定</a></p>
+  </div>
+  <div class="ui-block-b">
+    <p><a data-role="button" data-rel="back">キャンセル</a></p>
+  </div>
+
+</script>
+</body>
+</html>
